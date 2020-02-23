@@ -1,3 +1,4 @@
+
 # Table of Contents
 
 [Elastic Compute Cloud (EC2)](#Elastic-Compute-Cloud-(EC2))
@@ -1817,3 +1818,6 @@ hooks:
 - **Athena** can handle far more complex ad-hoc queries on data in Amazon S3, this entails an increase in operating cost as compared to **S3 Select**
 
 - In general, API actions stick to the **PascalCase** style with the first letter of every word capitalized. **However**, CLI actions use **hyphens** with lower case
+=======
+# architect
+>>>>>>> 11d14bd0d76860c20d2fd0e9f68a1aa13e385632
