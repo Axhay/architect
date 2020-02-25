@@ -11,6 +11,62 @@
 
 [Amazon Aurora](#Amazon-Aurora)
 
+[Cloudfront OAI](#Cloudfront-OAI)
+
+[Lambda Functions](#Lambda-Functions)
+
+[Cloudwatch](#Cloudwatch)
+
+[Simple Storage Service](#Simple-Storage-Service (S3))
+
+[Amazon Athena](#Amazon-Athena)
+
+[Virtual Private Cloud](#Virtual-Private-Cloud (VPC))
+
+[Elastic Beanstalk](#Elastic-Beanstalk)
+
+[Elastic Block Storage](#Elastic-Block-Storage (EBS))
+
+[Elastic File Stoarge (EFS)](#Elastic-File-Storage)
+
+[CloudFormation](#CloudFormation)
+
+[(RDS)](#Relational Database Service)
+
+[DynamoDB](#DynamoDB)
+
+[NAT Gateway](#NAT-Gateway)
+
+[EC2 Instance and Instance Types](#EC2-Instance-and-Instance-Types)
+
+[Security Groups and ALB](#Security-Groups-and-ALB)
+
+[CloudTrail](#CloudTrail)
+
+[Kinesis](#Kinesis)
+
+[API Gateway](#API-Gateway)
+
+[Load Balancers](#Load-Balancers)
+
+[ElasticCache] (#ElasticCache)
+
+[SQS](#Simple Queuing Service)
+
+[Route 53](#Route-53)
+
+[Messaging Queue](#Messaging-Queue)
+
+[Network Loadbalancers](#Network-Loadbalancers)
+
+[Miscellaneous](#Miscellaneous)
+
+
+
+
+
+
+
 ## Spot Instance
 
 1. Recover from Instance Failures.
