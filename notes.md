@@ -1,6 +1,8 @@
 
 # Table of Contents
 
+[Spot Instances](#Spot Instance)
+
 [Elastic Compute Cloud (EC2)](#Elastic-Compute-Cloud-(EC2))
 
 [CloudFormation](#CloudFormation)
@@ -42,6 +44,12 @@
 [Others](#Others)
 
 [Virtual Private Network (VPC)](#Virtual-Private-Network-(VPC))
+
+## Spot Instance
+
+1. Recover from Instance Failures.
+2. Continue processing from where you left off.
+3. Process files in parallel.
 
 ## Elastic Compute Cloud (EC2)
 
