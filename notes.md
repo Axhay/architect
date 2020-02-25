@@ -31,7 +31,7 @@
 
 [CloudFormation](#CloudFormation)
 
-[(RDS)](#Relational Database Service)
+[Relational Database Service](#Relational-Database-Service)
 
 [DynamoDB](#DynamoDB)
 
@@ -49,9 +49,9 @@
 
 [Load Balancers](#Load-Balancers)
 
-[ElasticCache] (#ElasticCache)
+[ElasticCache](#Elastic-Cache)
 
-[SQS](#Simple Queuing Service)
+[Simple Queuing Service](#Simple-Queuing-Service)
 
 [Route 53](#Route-53)
 
@@ -188,7 +188,7 @@ Scenarios:
 
 Scenarios:
 
-1. Bank is writing new softare dependant on DB transcations for write consistency.
+1. Bank is writing new software dependant on DB transcations for write consistency.
   - App will do joins across multiple tables.
   - DB must automatically scale as the amount of data grows.
   - AWS service to run the database.
