@@ -1,7 +1,7 @@
 
 # Table of Contents
 
-[Spot Instances](#Spot Instance)
+[Spot Instances](#Spot-Instance)
 
 [Elastic Compute Cloud (EC2)](#Elastic-Compute-Cloud-(EC2))
 
