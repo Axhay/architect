@@ -841,6 +841,508 @@ Scenarios:
 6. Which service should org use if it requires an easily managed and scalable platform to host its web app running on Nginx?
        - **AWS Elastic Beanstalk**
 
+## Elastic Block Storage
+
+1. Cold HDD (sc1):
+- Throughput-oriented storage for large volumes of data that is infrequently accessed
+- Scenarios where the lowest storage cost is important
+- Cannot be a boot volume
+2. very high sequential I/O and lowest cost
+3. Provisioned IOPS. Keywords: consistent performance, database, High I/O
+4. hdd : large, sequential i/o operations
+ssd : small, random i/o operations
+5. Because EBS is block storage while EC2 is Compute,S3 Object
+6. Once you see OLTP (transaction processing DB), I/O intensive DB the most consistent EBS storage is provisioned IOPS
+7. With Elastic Volumes, you can dynamically modify the size, performance, and volume type of your Amazon EBS volumes without detaching them.
+Use the following process when modifying a volume:
+(Optional) Before modifying a volume that contains valuable data, it is a best practice to create a snapshot of the volume in case you need to roll back your changes. For more information, see Creating Amazon EBS Snapshots.
+
+
+Scenarios:
+
+1. Customer has legacy application with large amount of data.
+  - Files accessed by app are around 10GB each, but rarely accessed.
+  - When accessed they are retrieved sequentially.
+  - Customer is migrating the app to AWS and would like to use EC2 and EBS.
+  - Least expensive EBS volume type in this use case?
+       - **Cold HDD (sc1)**
+
+2. Consider possible options for improving security of the data on EBS volume attached to EC2 instance. 
+  - Which solution will improve the security of the data?
+       - **Use AWS KMS to encrypt the EBS volume**
+
+3. Company deployed three tier web app on EBS backed EC2 instances for web and app tiers, and RDS for database tier.
+  - Company is concerned about the loss of data on the web and app tiers.
+  - What is the most efficient way to prevent data loss?
+       - **Create a snapshot lifecycle policy that takes periodic snapshots of the Amazon EBS volumes**
+
+4. Company has many applications on EC2 instances running in auto scaling groups.
+  - Company policies require that data on EBS volume must be retained.
+  - Which actions will meet these requirements without impacting performance?
+        - **Disable DeleteOnTermination for the Amazon EBS volumes.**
+
+5. SA is trying to bring data warehouse workload to an EC2 instance. 
+  - The data will reside in EBS volumes and full table scans will be executed frequently. 
+  - What type of EBS volume would be most suitable in this scenario?
+        - **Throughput Optimized HDD (st1)**
+
+6. SA must select storage type for big data app that requires very high sequential I/O.
+  - The data must persist if the instance is stopped.
+  - Which of the following storage types will provide best fit at the LOWEST cost for the app?
+        - **An Amazon EBS throughput optimized HDD volume.**
+
+7. AWS workload in a VPC is running a legacy database on EC2 instance. 
+ - Data is stored on 200GB EBS (gp2) volume. 
+ - At peak load times, logs show excessive wait time. 
+ - What solution should be implemented to improve DB performance using persistent storage?
+       - **Migrate the data on the EBS volume to provisioned IOPS SSD (io1).**
+
+8. Company is migrating its data center to AWS.
+  - As part of this migration, there is a three-tier web app that has strict data-at-rest encryption requirements. 
+  - Customer deploys this app on EC2 using EBS and now must provide encryption at-rest. 
+  - How can these requirements be met without changing the application?
+       - **Use encrypted EBS storage volumes with AWS-managed keys.**
+
+9. SA is designing a DB solution that must support a high rate of random disk reads and writes.
+ - It must provide consistent performance, and requires long term persistence. 
+ - Which storage solution BEST meets these requirements
+       - **An Amazon EBS Provisioned IOPS volume**
+
+10. SA is designing a solution for a media company that will stream large amounts of data from EC2 instance. 
+ - Data streams are large and sequential, and must be able to support up to 500MB/s. 
+ - Which storage type will meet performance requirements of this app?
+        - **EBS Throughput Optimized HDD**
+
+11. SA is designing an app on AWS that uses persistent block storage.
+ - Data must be encrypted at rest. 
+ - Which sol meets the requirement?
+       - **Encrypt Amazon EBS volumes on Amazon EC2 instances.**
+
+12. Company has a legacy app using a proprietary file system and plans to migrate the app to AWS.
+ - Which storage service should the company use?
+       - **Amazon EBS**
+
+13. SA is designing a log-processing solution that requires storage that supports up to 500MB/s throughput.
+ - The data is sequentially accessed by EC2 instance.
+ - Which storage type satisfies these requirements?
+       - **EBS Throughput Optimized HDD (st1)**
+
+14. Devs are creating a new OLTP app for a small DB that is very read-write intensive. 
+ - A single table in the database is updated continuously throughout the day, and the devs want to ensure that the DB performance is consistent.
+ - Which EBS storage option will achieve the MOST consistent performance to help maintain app performance?
+       - **Provisioned IOPS SSD**
+
+15. SA is designing an app that uses EBS volumes.
+ - The volumes must be backed up to a different region. How should SA meet these requirements?
+       - **Create EBS snapshots and then copy them to the desired region.**
+
+16. An app requires block storage for file updates.
+ - Data is 500 GB and must continuously sustain 100MB/s of aggregate read/write operations.
+ - Which storage option is appropriate for this app?
+       - **Amazon EBS**
+
+17. SA must review an application deployed on EC2 instances that currently stores multiple 5-GB files on attached instance store volumes.
+ - The company recently experienced a significant data loss after stopping and starting their instances and wants to prevent the data loss from happening again.
+ - Sol should minimize performance impact and the number of code changes required.
+ - What should SA recommend?
+        - **Store the application data in an EBS volume**
+
+18. Which requirement must be met in order for SA to specify that an EC2 instance should stop rather than terminate when its Spot instance is interrupted?
+        - **The Spot Instance request type must be persistent.**
+        - **The root volume must be an Amazon EBS volume.**
+
+19. Company runs a legacy app with single tier architecture on EC2 instance.
+ - Disk I/O is low, with occasional small spikes during business hours.
+ - Company requires the instance to be stopped from 8PM to 8AM daily.
+ - Which storage option is MOST appropriate for this workload?
+       - **Amazon EBS General Purpose SSD (gp2) storage**
+
+20. SA is designing the storage layer for a production relational DB.
+ - DB will run on EC2. DB is accessed by an application that performs intensive reads and writes, so the DB requires the LOWEST random I/O latency.
+ - Which data storage method fulfills the above requirements?
+       - **Stripe data across multiple Amazon EBS volumes using RAID 0.**
+
+Keyword "Hosted on EC2 and we know EC2 uses block storage =EBS. Plus RAID 0 increases performance
+
+21. SA is building an app on AWS that will need 20,000 IOPS on particular volume to support media event. 
+ - Once the event ends, the IOPS need is no longer required.
+ - Marketing team asks the Architect to build a platform to optimize storage without incurring downtime. 
+ - How should SA design a platform to meet these requirements?
+       - **Change the EBS volume type to Provisioned IOPS.**
+
+22. Company is writing a new service running on EC2 that must create thumbnail images of thousands of images in a large archive. The system will write scratch data to storage during the process. Which storage service is best suited for this scenario?
+       - **Amazon EBS Throughput Optimized HDD (st1)**
+
+## Elastic File Storage
+
+1. EFS are as good as NFS on Linux
+"migrating to AWS" and "without code changes" are the key words.
+2. "Mount storage" keyword : EFS.
+3. Key word : strong data consistency and file locking
+4. File-locking = EFS
+5. When you hear POSIX-compliant, first thought is normally AWS EFS:
+
+Amazon EFS provides elastic, shared file storage that is POSIX-compliant. The file system you create supports concurrent read and write access from multiple Amazon EC2 instances and is accessible from all of the Availability Zones in the AWS Region where it is created.
+
+Scenarios:
+
+1. Customer is migrating to AWS and requires applications to access Network File System shares without code changes.
+ - Data is critical and accessed frequently.
+ - Which storage solution should SA recommend to maximize availability and duration?
+        - **Amazon EFS**
+
+2. Design elastic application that will have between 10 to 50 EC2 concurrent instances running, dependent on load.
+ - Each instance must mount storage that will read and write to the same 50GB folder.
+ - What storage type will meet requirements?
+       - **Amazon EFS**
+
+3. Company is deploying a reporting application on EC2.
+ - Application is expected to generate 1,000 documents every hour and each document will be 800 MB.
+ - Company is concerned about strong data consistency and file locking, as various applications hosted on other EC2 instances will process report documents in parallel when they become available.
+ - What storage solution will meet these requirements with LEAST amount of administrative overhead?
+        - **Amazon EFS**
+
+4. SA is designing a shared file system for a company.
+ -  Multiple users will be accessing it at any given time.
+ - Different teams will have their own directories, and company wants to secure files so that users can access only files owned by their team.
+ - How should SA design this?
+       - **Use Amazon EFS and control permissions by using file-level permissions.**
+
+5. SA is helping customers to migrate applications to AWS.
+ - The application is composed of a fleet of Linux servers that currently use shared file system to read and write data. 
+ - One of the goals of moving this application to AWS is to increase the reliability of the storage tier.
+ - What solution would increase reliability while minimizing the operational overhead of managing this infrastructure?
+       - **Create an EFS file system and mount it to all the servers.**
+
+6. An application runs on multiple EC2 instances.
+ - Each running instance of the app must have access to a shared file system.
+ - Where should the data be stored?
+       - **Amazon EFS**
+
+7. SA is developing a solution for sharing files in an organization.
+ -  Solution must allow multiple users to access the storage service at once from different virtual machines and scales automatically. 
+ - It must also support file-level locking.
+ - Which storage service meets the requirements of this use case?
+       - **Amazon EFS**
+
+8. Media company asked SA to design a highly available storage sol to serve as a centralized document store for their EC2 instances.
+ - The storage sol needs to be POSIX-compliant, scale dynamically and be able to serve up to 100 concurrent EC2 instances. 
+ - Which solution meets these requirements?
+       - **Create an Amazon Elastic File System (Amazon EFS) to store and share the documents.**
+
+## CloudFormation
+
+1. Cloud formation is the IAC tool ( infrastructure as code)
+2. Replicate the environment of on premises to AWS by using CloudFormation.
+3. For Availability Multi AZ, For Performance Read Replica
+
+Scenarios:
+1. Clients notice that their engineers often make mistakes when creating SQS queues for their backend system.
+ - Which action should SA recommend to improve this process?
+       - **Use AWS CloudFormation Templates to manage the Amazon SQS queue creation.**
+
+2. SA is designing a new app that will  be hosted on EC2 instances.
+ - This app has the following traffic requirements.
+ - Accept HTTP(80)/HTTPS(443) traffic from the internet. 
+ -  Accept FTP(21) traffic from the finance team servers at 10.10.2.0/24.
+ -  Which of the following AWS cloudformation snippets correctly declares inbound security group rules that meet requirements and prevent unauthorized access to additional services on the instance?
+
+       **IpProtocol:"udp""FromPort":"443""ToPort":"443""CidrIp":"0.0.0.0/0"**
+       **IpProtocol:"udp""FromPort":"80""ToPort":"80""CidrIp":"0.0.0.0/0"**
+       **IpProtocol:"udp""FromPort":"21""ToPort":"21""CidrIp":"10.10.2.0/24"**
+
+TCP/80 and TCP/443 from any
+
+3. SA has designed a VPC that meets all necessary security requirements for their organization. 
+ - Any applications deployed in the organization must use this VPC design.
+ - How can project teams deploy, manage and delete VPCs that meet this design with LEAST admin effort?
+        - **Deploy an AWS CloudFormation template that defines components of the VPC.**
+
+4. SA was tasked with reviewing several templates that build VPCs and ensuring that they meet specific security requirements.
+ - After reviewing the templates, the architect realizes that all of the templates are missing important security best practices.
+ - How should SA do to implement security best practices in efficient manner?
+       - **Provide the teams a nested AWS CloudFormation template that builds the VPC correctly**
+
+5. SA needs to use AWS to implement pilot light disaster recovery for a three-tier web app hosted in an on-premises datacenter.
+ - Which sol allows rapid provision of working, fully scaled production environment?
+       - **Continuously replicate the production database server to Amazon RDS. Use AWS CloudFormation to deploy the application and any additional servers if necessary.**
+
+## RDS - Relational Database Service.
+
+1. With RDS Storage Auto Scaling, you simply set your desired maximum storage limit, and Auto Scaling takes care of the rest.
+2. You can only enable encryption for an Amazon RDS DB instance when you create it, not after the DB instance is created.
+For an Amazon RDS encrypted DB instance, all logs, backups, and snapshots are encrypted.
+3. DynamoDB is HA. But Postgre is'nt. So a Multi AZ is needed.
+4. You can enable point-in-time recovery using the AWS Management Console, AWS Command Line Interface (AWS CLI), or the DynamoDB API. When it's enabled, point-in-time recovery provides continuous backups until you explicitly turn it off.
+DR takes things to a completely new level, wherein you need to be able to recover from a different region that’s separated by over 250 miles.
+5. Think read replicas when performance is mentioned. Think Multi-AZ when high availability is mentioned
+6. In a Multi AZ, AWS runs just one DB but copies the data synchronously to the standby replica
+The question targets Read Contention( responsiveness ) and write is not an issue and hence the Read Replicas.
+7. The application servers and database must be secure. so it must be on a private subnet.
+In question itself we have	 answer. ELB already in public subnet .Elb will communicate to private subnet.
+
+Scenarios:
+
+1. Customer deploying production portal application on AWS.
+ - The database tier has structured data.
+ - Company needs a solution that is easily manageable and highly available. 
+       - **Use Amazon RDS with a multiple Availability Zone option.**
+
+2. Retail company runs hourly flash sales has performance issue on RDS for PostgreSQL database.
+ - DBA identified the issue with performance happens when finance and marketing employees refresh sales dashboards used for reporting real-time sales data. 
+ - How to resolve issue without impacting performance?
+       - **Create a Read Replica of the RDS PostgreSQL database and point the dashboards at the Read Replica.**
+
+3. Companies Amazon RDS MySQL DB instance may be rebooted for maintenance and to apply patches.
+ - This database is critical and potential user disruption must be minimized. 
+ - What should SA do in this scenario?
+       - **Set RDS MySQL to Multi-AZ.**
+
+4. Company setting new website for online sales.
+ - Company will have a web and database tier.
+ - Web tier consists of load-balanced, auto-scaled EC2 instance in multiple AZ.
+ - Database tier is an RDS Multi AZ deployment. 
+ - EC2 instances must connect securely to DB.
+ - How should resources be launched?
+       - **EC2 instances: private subnet RDS database instances: private subnet Load balancer: public subnet**
+ELB can be in public subnet while EC2 and RDS can be in private subnet
+
+5. Company migrating on-prem DB to AWS
+ -  Companys backend application produces large amount of DB queries for reporting purposes, and company wants to offload some of those reads to Read Replica, allowing primary database to continue performing efficiently.
+ - Which AWS DB platforms will accomplish this?
+        - **Amazon RDS for PostgreSQL**
+        - **Amazon RDS for MariaDB**
+
+6. What conditions will cause Multi-AZ RDS failover to occur?
+        - **An Availability Zone becomes unavailable**
+        - **A failure of the primary database instance**
+
+7. During performance testing of an application, RDS database caused a performance bottleneck.
+ - What steps can be taken to improve database performance?
+       - **Scale up to a larger RDS instance type.**
+       - **Redirect read queries to RDS read replicas.**
+
+8. App running on EC2 has been experiencing performance issues when accessing RDS for Oracle database.
+  - The database has been provisioned correctly for average workloads, but there are several usage spikes each day that have saturated the database, causing the application to time out.
+  - The application is write-heavy, updating information more often than reading information. 
+  - SA has been asked to review the application design.
+  - What should the SA recommend to improve performance?
+       - **Change the Amazon RDS instance storage type from General Purpose SSD to provisioned IOPS SSD.**
+  
+9. SA is designing a two tier application for maximum security, with a web tier running on EC2 instances and the data stored in an RDS DB instance.
+ - The web tier should accept user access only through HTTPS connections (443) from the Internet, and data must be encrypted in transit to and from DB.
+ - What combination of steps will MOST securely meet the stated requirements?
+       - **Create a security group for the web tier instances that allows inbound traffic only over port 443.**
+       - **Configure the web servers to communicate with RDS by using SSL, and issue certificates to the web tier EC2 instances.**
+
+10. Company has an application that accesses MySQL database installed on a single EC2 instance. 
+ - The instance recently experienced a fault and brought down the entire application for several hours.
+ - Company wants to address the issue but is concerned about spending too much time modifying application code or managing the legacy application.
+ - What should SA recommend to remove this single point of failure with FEWEST changes to the application code and the LEAST amount of admin effort?
+       - **Migrate the database to an RDS MySQL Multi-AZ DB instance, and point the application servers to the new RDS instance.**
+
+11. App uses an Amazon RDS MySQL cluster for the DB layer. 
+ - DB growth requires periodic resizing of the instance. 
+ - Currently, admins check the available disk space manually once a week. 
+ - How can this process be improved?
+       - **Use Auto Scaling to increase storage size.**
+
+12. SA is designing a solution that will include database in RDS.
+ - Corporate security policy mandates that the database, its logs, and its backups are all encrypted - Which is the MOST efficient option to fulfill the security policy using RDS?
+        - **Launch an Amazon RDS instance with encryption enabled. Logs and backups are automatically encrypted.**
+
+13. Team has an application that detects new objects being uploaded into S3 bucket. 
+ - The uploads trigger a Lambda function to write object metadata into DynamoDB table and RDS PostgreSQL database. 
+ - Which action should the team take to ensure high availability?
+       - **Enable multi-AZ on the RDS PostgreSQL database.**
+
+14. On-premises database is experiencing significant performance problems when running SQL queries. 
+ - With 10 users, the lookups are performing as expected. 
+ - As the number of users increases, the lookups take three times longer than expected to return values to an application.
+ - Which action should SA take to maintain performance as the user count increases?
+        - **Configure Amazon RDS with additional read replicas.**
+
+15. Company has a legal requirement to store point-in time copies of its RDS PostGRESQL db instance in facilities that are at least 200 miles apart. 
+ -  Use of which of the following provides the easiest way to comply with this requirement?
+       - **Cross-region snapshot copy**
+
+16. Company has RDS DB backing its production website.
+ - The sales team needs to run queries against the DB to track training program effectiveness. 
+ - Queries against the production database cannot impact performance, and the solution must be easy to maintain.
+ - How can these requirements be met?
+       - **Use an Amazon RDS read replica of the production database and allow the team to query against it.**
+
+17. Client is migrating legacy web app to AWS cloud. The current system uses an Oracle DB as RDBMS. 
+ - Backups occur every night, and the data is stored on-premises.
+ - SA must automate the backups and identify a storage solution while keeping costs low.
+ - Which AWS service will meet these requirements?
+       - **Amazon RDS**
+
+18. SA is deploying a new production MySQL DB on AWS.
+ - It is critical that the database is highly available.
+ - What should SA do to achieve this goal with RDS?
+       - **Enable multi-AZ to create a standby database in a different Availability Zone.**
+  
+19. Company has RDS managed online transaction processing system that has very heavy read and write. 
+ - The SA notices throughput issues with the system.
+ - How can the responsiveness of the primary database be improved?
+       - **Offload SELECT queries that can tolerate stale data to READ replica.**
+
+20. App stack includes an ELB in public subnet, a fleet of EC2 instances in an auto scaling group, and RDS MySQL cluster. 
+ - Users connect to the app from the Internet. 
+ - App servers and DB must be secure.
+ - How should SA perform this task?
+       - **Create a private subnet for the Amazon EC2 instances and a private subnet for the Amazon RDS cluster.**
+
+21. Customer has a production app that frequently overwrites and deletes data, the app requires the most up to date version of the data every time it is requested.
+ - Which storage should SA recommend to best accomodate this use case? 
+       - **Amazon RDS**
+
+22. Lambda function must execute query against an RDS database in a private subnet.
+ - Which steps are required to allow Lambda function to access the RDS database? 
+       - **Create the Lambda function within the Amazon RDS VPC.**
+       - **Change the ingress rules of the Amazon RDS security group, allowing the Lambda security group.**
+
+23. SA is designing an architecture for mobile gaming app. App is expected to be very popular. 
+ - The Architect needs to prevent the RDS MySQL db from becoming a bottleneck due to frequently accessed queries.
+ - Which service or feature should the architect add to prevent a bottleneck?
+       - **Amazon ElastiCache in front of the RDS MySQL Database**
+
+24. App stores data in RDS PostgreSQL Multi-AZ database instance. Ratio of read to write requests is about 2 to 1. Recent increases in traffic are causing very high latency. How can this problem be solved?
+       - **Create a read replica and send all read traffic to it.**
+
+25. Customer is running a critical payroll system in Production environment in one data center and a DR environment in another. App includes load-balanced web servers and failover for MySQL database. Customers DR process is manual and error-prone. For this reason, management has asked IT to migration application to AWS and make it highly available so that IT no longer has to manually fail over the environment. How should SA migrate system to AWS?
+       - **Migrate the production environment to span multiple Availability Zones, using Elastic Load Balancing and Multi-AZ Amazon RDS. Decommission the DR environment because it is no longer needed.**
+
+## DynamoDB 
+
+1. Amazon DynamoDB is a key-value and document database that delivers single-digit millisecond performance at any scale. It's a fully managed, multiregion, multimaster, durable database with built-in security, backup and restore, and in-memory caching for internet-scale applications. DynamoDB can handle more than 10 trillion requests per day and can support peaks of more than 20 million requests per second.
+Many of the world's fastest growing businesses such as Lyft, Airbnb, and Redfin as well as enterprises such as Samsung, Toyota, and Capital One depend on the scale and performance of DynamoDB to support their mission-critical workloads.
+Hundreds of thousands of AWS customers have chosen DynamoDB as their key-value and document database for mobile, web, gaming, ad tech, IoT, and other applications that need low-latency data access at any scale. Create a new table for your application and let DynamoDB handle the rest.
+2. Extreme Performance While DynamoDB offers consistent single-digit millisecond latency, DynamoDB + DAX takes performance to the next level with response times in microseconds for millions of requests per second for read-heavy workloads. With DAX, your applications remain fast and responsive, even when a popular event or news story drives unprecedented request volumes your way. No tuning required.
+3. DAX handles millions of req per sec
+4. Let’s assume you want to take a backup of one of your DynamoDB tables each day. A simple way to achieve this is to use an Amazon CloudWatch Events rule to trigger an AWS Lambda function daily. In this scenario, in your Lambda function you have the code required to call the dynamodb:CreateBackup API operation
+5. You can tell the application to perform a strongly consistent read. This will force DynamoDB to return the most up to date information.
+6. AWS Data pipeline is the web service you can use to automate the movement and transformation of data.  You can define data-driven workflows, so that tasks can be dependent on the successful completion of previous tasks. You define the parameters of your data transformations and AWS data Pipeline enforces the logic that you have setup.
+7. Many companies consider migrating from relational databases like MySQL to Amazon DynamoDB, a fully managed, fast, highly scalable, and flexible NoSQL database service. For example, DynamoDB can increase or decrease capacity based on traffic, in accordance with business needs. The total cost of servicing can be optimized more easily than for the typical media-based RDBMS.
+8. The 8KB is significant as it fits inside of the 400KB item size limit of DynamoDB and there is viable:
+Items
+Item Size
+The maximum item size in DynamoDB is 400 KB
+Other than this low latency retrieval, durable and 'cost is not a factor' all points to the DynamoDB answer here.
+9. DynamoDB is typically useful for storing a large number of small records with single digit millisecond latency.
+10. DynamoDB. Keywords: indexed data
+11. "key = value" and "semi-structured" ==> NoSQL DB = DynamoDB
+12. Amazon DynamoDB transactions simplify the developer experience of making coordinated, all-or-nothing changes to multiple items both within and across tables. Transactions provide atomicity, consistency, isolation, and durability (ACID) in DynamoDB, enabling you to maintain data correctness in your applications easily.
+13. Requirements: MOST cost-efficient change to support the increased traffic with minimal changes to the application
+* Cost effective: only scale up when needed
+* No change to application
+
+Scenario:
+
+1. Design ride sharing application. 
+ - App needs consistent and single digit millisecond latency.
+ - App must integrate with highly scalable and fully managed database service to track GPS coordinate and user data for all rides.
+ - Database service to meet these requirements?
+       - **Amazon DynamoDB**
+
+2. Review application that writes data to an Amazon DynamoDB table on daily basis. 
+ - Random table read occurs many times per second. 
+ - Company wants to allow thousands of low-latency reads and avoid any negative impact to the rest of the application. 
+ - What should SA do to meet companys goals
+       - **Use DynamoDB Accelerator to cache reads.**
+
+3. Three tiered applications are created to host small news articles.
+ - App is expected to serve millions of users.
+ - When breaking news occurs, site must handle very large spikes in traffic without impacting database performance. 
+ - What design meets these requirements while minimizing costs? 
+       - **Use Amazon DynamoDB Accelerator (DAX) to cache read operations to the database**
+  
+4. Company storing data in DynamoDB table and needs to take daily backups and retain them for 6 months. 
+ - How can SA meet these requirements without impacting production workload?
+        - **Use Amazon CloudWatch Events to trigger an AWS Lambda function that makes an on-demand backup of the table**
+
+5. Company plans to deploy new application in AWS that reads and writes information to database.
+ - Company wants to deploy the application in two different AWS regions in an active active configuration.
+ - Database need to replicate to keep information in sync. 
+ - What should be used to meet these requirements?
+       - **Amazon DynamoDB with global tables**
+
+6. App is scanning an Amazon DynamoDB table that was created with default settings.
+ - App occasionally reads stale data when it queries the table. How can this issue be solved?
+        - **Update the application to use strongly consistent reads.**
+
+7. SA must design a DynamoDB table to store data about customer activities. 
+ - The data is used to analyze recent customer behavior, so data that is less than a week old is heavily accessed and older data is accessed infrequently.
+ - Data that is more than one month old never needs to be referenced by the application, but needs to be archived for year end analytics.
+ - What is the most cost efficient way to meet these requirements?
+       - **Create separate tables for each week's data with higher throughput for the current week.**
+       - **Export the old table data from DynamoDB to Amazon S3 using AWS Data Pipeline, and delete the old table.**
+
+8. Company has a Node.js application running on EC2 that currently retrieves data for customers from DynamoDB table.
+ - Company is seeing many repeat queries for the same items, and the number of queries is continuing to increase as the application gains popularity.
+ - What solution will reduce the number of read capacity units (RCUs) required while minimizing the amount of refactoring that must be done to the application?
+        - **Use Amazon DynamoDB Accelerator (DAX) to provide a caching layer**
+
+9. Company is rolling out a new web service but is unsure how many customers service will attract.
+ - However, the company is unwilling to accept any downtime.
+ - What could SA recommend to the company in order to keep track of customers current session data?
+        - **Amazon DynamoDB**
+
+10. University is running an internal web app on AWS that students can access from university n/w to check their exam results. The web app runs on EC2 instances and pulls results from DynamoDB table. Auto scaling is currently configured to add a new web server when CPU is greater than 80% for 5 mins. DynamoDB is config to increased both read and write capacity units by 5 when utilization is greater than 80% Exam results are released at 9am each monday, and 80% of students, attempt to access their unique results within first 30 mins. Despite auto scaling being enabled, students are complaining of slow response times and errors when they view the site. There are no performance complaints after 930am on monday. Which rec should SA make to improve performance in a cost-effective manner?
+       - **Use a scheduled job to scale out EC2 before 9:00 a.m. on Monday and to scale down after 9:30 a.m.**
+
+11. Company is looking for fully managed solution to store its players state info for rapidly growing game. App runs on multiple EC2 node, which can scale according to incoming traffic. Request can be routed to any of the nodes, therefore, state info must be stored in centralized DB. The players state info needs to be read with strong consistency and needs conditional updates for any changes. Which service would be MOST cost-effective and scale seamlessly?
+       - **Amazon DynamoDB**
+
+12. Customer owns MySQL DB that is accessed by various clients who expect at most, 100ms latency on requests. Once a record is stored in the DB, it rarely changed. Clients only access one record at a time. Database access has been increasing due to increased client demand. The resultant load will soon exceed capacity of most expensive hardware available for purchase. The customer wants to migrate to AWS, and is willing to change DB systems. Which service would alleviate db load issue and offer virtually unlimited scalability for the future?
+       - **Amazon DynamoDB**
+
+13. Company wants to durably store data in 8KB chunks. The company will access the data once every few months. However, when the company does access the data, it must be done with as little latency as possible. Which AWS service should SA recommend if cost is NOT a factor?
+       - **Amazon DynamoDB**
+
+14. SA is designing a solution to monitor weather changes by the minute. The frontend application is hosted on EC2 instance. The backend must be scalable to a virtually unlimited size, and data retrieval must occur with minimal latency. Which AWS service should the architect use to store the data and achieve these requirements?
+        - **Amazon DynamoDB**
+
+15. SA is building a new feature using Lambda to create metadata when a user uploads pic to S3. All metadata must be indexed. Which AWS service should SA use to store this metadata?
+       - **Amazon DynamoDB**
+
+16. Org is currently hosting a large amount of frequently accessed data consisting of key-value pairs and semi-structured documents in their data center. They are planning to move this data to AWS. Which one of the following services MOST effectively meets their needs?
+       - **Amazon DynamoDB**
+
+17. Company is launching an app that it expects to be very popular. The company needs a DB that can scale with the rest of the app. The schema will change frequently. The app cannot afford any downtime for DB changes. Which AWS service allows the company to achieve these objectives?
+       - **Amazon DynamoDB**
+
+18. Data analytics startup company asks SA to recommend AWS data store options for indexed data. Data processing engine will generate and input more than 64 TB of processed data every day, with item sizes reaching up to 300 KB. The startup is flexible with data storage and is more interested in DB that requires minimal effort to scale with growing dataset size. Which AWS data store service should SA recommend?
+       - **Amazon DynamoDB**
+
+19. Web app running on EC2 instances writes data synchronously to DynamoDB table configured for 60 write capacity units. During normal operation the app writes 50Kb/s to the tale, but can scale up to 500kb/s during peak hours. The app is currently throttling errors from DynamoDB table during peak hours. What is the MOST cost-efficient change to support increased traffic with min changes to app?
+       - **Configure Amazon DynamoDB Auto Scaling to handle the extra demand.**
+
+## NAT Gateway
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+
 
 
 
