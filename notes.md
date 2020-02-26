@@ -183,52 +183,52 @@ Scenarios:
 Scenarios:
 
 1. Bank is writing new software dependant on DB transcations for write consistency.
-  - App will do joins across multiple tables.
-  - DB must automatically scale as the amount of data grows.
-  - AWS service to run the database.
-   - **Amazon Aurora.**
+   - App will do joins across multiple tables.
+   - DB must automatically scale as the amount of data grows.
+   - AWS service to run the database.
+     - **Amazon Aurora.**
 
 2. Design Disaster recovery (DR) in separate AWS region from applications primary workload.
-  - Multi tier architecture and only RDS instance have frequent changes.
-  - App installation takes 60 mins on average.
-  - DR have an RPO of less than 90 mins and RTO of less than 30 mins. 
-  - To meet these:
-   - **An Aurora instance as primary database with read replica in DR region.**
-   - **A cross region EC2 AMI copy.**
+   - Multi tier architecture and only RDS instance have frequent changes.
+   - App installation takes 60 mins on average.
+   - DR have an RPO of less than 90 mins and RTO of less than 30 mins. 
+   - To meet these:
+     - **An Aurora instance as primary database with read replica in DR region.**
+     - **A cross region EC2 AMI copy.**
 
 3. App stores data in RDS MySQL DB instance.
-  - DB queries consists of read queries, which are overwhelming current database.
-  - SA wants to scale the database.
-  - What combination of steps to achieve goal?
-   - **Migrate MySQL database to Aurora.**
-   - **Create read replicas in different AZ.**
+   - DB queries consists of read queries, which are overwhelming current database.
+   - SA wants to scale the database.
+   - What combination of steps to achieve goal?
+     - **Migrate MySQL database to Aurora.**
+     - **Create read replicas in different AZ.**
 
 4. Team launching marketing campaign and the peak database read activity in Aurora for MySQL is expected to increase.
-  - SA decides to add two Read replicas to the cluster.
-  - How should SA ensure that connections for read activities are load balanced?
-   - **Reader endpoint for amazon Aurora.**
+   - SA decides to add two Read replicas to the cluster.
+   - How should SA ensure that connections for read activities are load balanced?
+      - **Reader endpoint for amazon Aurora.**
 
 5. SA is creating new relational DB.
-  - Compliance team will use DB, and mandates that data content must be stored across three different AZ.
-  - Which option to use?
-   - **Aurora.**
+   - Compliance team will use DB, and mandates that data content must be stored across three different AZ.
+   - Which option to use?
+      - **Aurora.**
 
 6. Company wants to migrate a highly transactional DB to AWS.
-  - Requirements state that the DB has more than 6TB of data and will grow exponentially.
-  - Which solution should SA recommend?
-   - **Amazon Aurora.**
+   - Requirements state that the DB has more than 6TB of data and will grow exponentially.
+   - Which solution should SA recommend?
+      - **Amazon Aurora.**
 
 7. Web app stores all data in RDS Aurora DB instance.
-  - SA wants to provide access to the data for detailed report for marketing team, but is concerned that additional load on the DB will affect the performance of web app.
-  - How can report be created without affecting performance of application?
-    - **Create a read replica of the database.**
+   - SA wants to provide access to the data for detailed report for marketing team, but is concerned that additional load on the DB will affect the performance of web app.
+   - How can report be created without affecting performance of application?
+      - **Create a read replica of the database.**
 
 8. Popular e-commerse app runs on AWS.
-  - The app encounters performance issues.
-  - DB is unable to handle amount of queries and load during peak hours.
-  - The DB is running on RDS Aurora engine on the largest instance size available.
-  - What should admin do to improve performance?
-   - **Create one or more read replicas.**
+   - The app encounters performance issues.
+   - DB is unable to handle amount of queries and load during peak hours.
+   - The DB is running on RDS Aurora engine on the largest instance size available.
+   - What should admin do to improve performance?
+      - **Create one or more read replicas.**
 
 
 ## Cloudfront OAI
@@ -332,6 +332,7 @@ Scenarios:
        - **Update the bucket policy to grant access to it.**
        - **Create CloudFront origin access identity.**
 
+**
 
 
 
