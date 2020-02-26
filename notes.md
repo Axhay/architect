@@ -61,12 +61,6 @@
 
 [Miscellaneous](#Miscellaneous)
 
-
-
-
-
-
-
 ## Spot Instance
 
 1. Recover from Instance Failures.
@@ -235,6 +229,115 @@ Scenarios:
   - The DB is running on RDS Aurora engine on the largest instance size available.
   - What should admin do to improve performance?
    - **Create one or more read replicas.**
+
+
+## Cloudfront OAI
+
+1. CDN offered by AWS. 
+2. CDN provides a globally distributed network of proxy servers with cache content, such as web videos or other bulky media, more locally to customers, thus improving access speed for downloading the content.
+3. Website serves millions of users globally.
+4. Minimize/Reduce data transfer cost.
+5. More cost effective for more frequently accessed objects.
+6. Host static website in S3 bucket.
+7. Deliver your entire website or application including static, dynamic, streaming and interactive content.
+8. Users located in many places across the world.
+9. Cache option for cloudfront which cache static and dynamic content is the best option.
+10. Location wise content delivery is already enabled.
+11. Most cost effective than S3 transfer for frequently accessed objects.
+12. Improve image load time.
+13. No cost of data transfer between S3 and CloudFront.
+14. Cloudfront can access bucket on behalf of requestors.
+15. No cost of data transfer between S3 and cloudfront.
+16. Cache option of cloud front in best solution.
+17. OAI: Content is available for 14 days before user is denied access.
+18. Allow users to purchase premium and shared content in S3 bucket.
+19. Restrict access with least operational overhead.
+
+Scenarios:
+
+1. Org uses S3 to store video content via the website.
+    - Org has right to deliver this content to users within its own country and needs to restrict access.
+    - Ensure files are accessible only from within the country.
+
+2. Company runs a static website served through cloudfront.
+    - Storing website content in S3 instead of EBS.
+       - **S3 is an origin for cloud front.**
+       - **EBS volumes need EC2 instances behind an ELB load balancer to be an origin.**
+
+3. Website runs on EC2 instances behind ELB ALB.
+    - Instances run in EC2 auto scaling group across multiple AZ.
+    - Every night, auto scaling group doubles in size.
+    - Traffic shows that users in particular region requesting same static content stored locally on EC2 instances.
+    - How can SA reduce need to scale and improve app performance for users.
+        - **Create cloudfront distribution for the site and redirect user traffic to the distribution.**
+
+4. Retail company runs on EC2 instances behind ALB. Instances run in EC2 auto scaling group.
+
+    - Images are stored in S3 bucket using custom domain name.
+    - During flash sale with 10,000 simultaneous users, some images on website are not loading.
+    - How to improve performance?
+       - **Config cloud front with S3 bucket as origin.**
+
+5. SA needs to design a solution that allows web devs to deploy static web content without managing server infrastructure.
+
+    - All web content must be accessed over HTTPS without custom domain name.
+    - Sol be scalable as company grows.
+    - Which provides most cost effective solution?
+      - **Cloudfront with S3 bucket origin.**
+
+6. Company needs to expand web services from us-east-1 to ap-southeast-1.
+    - Company stores large amount of static content on its web and recently received complaints about slow loading speeds and website timing out.
+    - What can be done to meet expansion goal and also addressing latency and timeout issues?
+      - **Use S3 to store static content and configure Amazon Cloudfront distribution.**
+
+7. Company creating web app allows customers to view photos in their web browsers.
+    - Web is hosted in us-east-1 on EC2 instances behind an ALB.
+    - Users will be located in many places around the world.
+    - Which sol provides all users with fastest photo viewing experience.
+       - **Enable cloudfront for website and specify ALB as the origin.**
+
+8. Company has application that uses Cloudfront for content hosted on S3 bucket.
+    - After unexpected refresh, users are still seeing old content.
+    - Which step SA take to ensure new content is displayed?
+       - **Change TTL value for removing the old objects.**
+
+9. Company has website on premises.
+    - Website has mix of static and dynamic content, but users experience latency when loading static files.
+    - Which AWS service can help reduce latency?
+       - **CloudFront with onpremises servers as the origin.**
+
+10. Reduce compute costs due to serving high amounts of static web content.
+    - How can web server architecture be designed to be MOST cost efficient?
+       - **Create CloudFront distribution to pull static content from S3 bucket.**
+
+11. Company using S3 bucket in us-west-2 to serve videos to their customers.
+    - Customers are located all around the world and videos are requested a lot during peak hours.
+    - Customers in Europe complain about slow downloaded speeds, and during peak hours, customers in all locations report experiencing HTTP 500 errors. 
+    - What can SA do to address these issues?
+       - **Cache the web content with CloudFront and use all Edge locations for content delivery.**
+
+12. Ability to handle higher volumes. Web tier is cost-optimized.
+       - **Launch EC2 instances in an Auto scaling group behind an ELB.**
+       - **Create an CloudFront distribution pointing to static content in S3.**
+
+13. Company is launching new static web on S3 and cloud front.
+       - **Ensure all request goes through cloudfront.**
+
+14. SA is asked to deliver video content on S3 to specific users from cloudfront restricting access by unauthorized users.
+       - **Use OAI for cloudfront to access private S3 objects and select Restruct Viewer access option in Cloudfront cache behavior to use Signed URLs.**
+
+15. Company wants to improve latency by hosting images in S3 bucket.
+  - Need to restrict access to S3 bucket allowing cloud front to continue proper functionality.
+  - Making bucket private to restrict access with LEAST operational overhead.
+       - **Update the bucket policy to grant access to it.**
+       - **Create CloudFront origin access identity.**
+
+
+
+
+
+
+
 
 
 
