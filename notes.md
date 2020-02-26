@@ -332,6 +332,560 @@ Scenarios:
        - **Update the bucket policy to grant access to it.**
        - **Create CloudFront origin access identity.**
 
+## Lambda Functions
+
+1. Improve fault tolerance of existing Python application.
+2. Least operation overhead.
+3. Serverless service.
+4. AWS will manage provisioning and managing.
+5. Redesign the process for high availability.
+6. Lambda is triggered in 3 ways:
+  a. API Gateway event.
+  b. DynamoDB events.
+  c. S3 events.
+
+Scenarios:
+
+1. Prediction process needs access to trained models stored on S3 bucket.
+  - Few seconds to process the image and make predictions.
+  - Process not overly resource intensive.
+  - Does not need specialized hardware.
+  - Takes less than 512MB to run.
+  - Most cost effective solution:
+       - **Lambda Functions**
+
+2. Lambda function needs access to RDS for SQL server instance.
+  - It is against the company policy to store passwords in lambda functions.
+  - How can SA enable lambda functions to retreive the DB password without violating company policy?
+       - **Use AWS Systems Manager Parameter Store**
+
+## Cloudwatch
+
+1. Must include a two minute warning.
+2. Memory -> only custom cloudwatch.
+3. Cloudtrail logs Api calls.
+4. You can configure Amazon CloudWatch Events to invoke a Lambda action in response to suspicious or unexpected behavior in your AWS environment detected by Amazon GuardDuty.
+5. The unified CloudWatch agent enables you to do the following:
+Collect more system-level metrics from Amazon EC2 instances across operating systems. The metrics can include in-guest metrics, in addition to the metrics for EC2 instances. The additional metrics that can be collected are listed in Metrics Collected by the CloudWatch Agent.
+
+Collect system-level metrics from on-premises servers. These can include servers in a hybrid environment as well as servers not managed by AWS.
+✑ Retrieve custom metrics from your applications or services using the StatsD and collectd protocols. StatsD is supported on both Linux servers and servers running Windows Server. collectd is supported only on Linux servers.
+✑ Collect logs from Amazon EC2 instances and on-premises servers, running either Linux or Windows Server.
+You can store and view the metrics that you collect with the CloudWatch agent in CloudWatch just as you can with any other CloudWatch metrics. The default namespace for metrics collected by the CloudWatch agent is CWAgent, although you can specify a different namespace when you configure the agent.
+6. There are 2 main types of monitoring you can do on AWS EC2 Instances as follows
+✑ Basic Monitoring for Amazon EC2 instances: Seven pre-selected metrics at five-minute frequency and three status check metrics at one-minute frequency, for no additional charge.
+✑ Detailed Monitoring for Amazon EC2 instances: All metrics available to Basic Monitoring at one-minute frequency, for an additional charge. Instances with
+Detailed Monitoring enabled allows data aggregation by Amazon EC2 AMI ID and instance type.
+7. 
+
+Scenarios:
+
+1. Ecommerce application places orders in SQS queue.
+  - When a message is received, EC2 worker instances process the request.
+  - EC2 instances are in Auto Scaling group.
+  - How should architecture be designed to scale up and down with LEAST amount of operational overhead?
+       - **Use an Amazon Cloudwatch alarm based on the number of visible messages to scale the Auto Scaling group up or down.**
+
+2. SA needs to configure scaling policied based on Cloudwatch metrics for an Auto scaling group.
+  - The application running on the instances is memory intensive.
+  - How can Architect meet this requirement?
+       - **Publish custom metrics to CloudWatch from the application.**
+
+3. SA is designing a solution to send CloudWatch Alarm notifications to a group of users on a smartphone mobile application.
+  - What are key steps to this solution?
+        - **Configure cloudwatch alarm to send the notification to an Amazon SNS topic whenever there is an alarm.**
+        - **Create the platform endpoints for mobile devices and subscribe the SNS topic with platform endpoints.**
+
+4. Web App runs on 10 EC2 instances launched from single customer Amazon Machine Language (AMI).
+  - EC2 instances are behind an Interet application load balancer.
+  - Amazon Route 53 provides DNS for the app.
+  - How should a SA automate recovery when a web server instance stops replying to requests?
+       - **Add cloudwatch alarm actions for each instance to restart if the Status check(Any) fails.**
+
+5. SA must migrate monolithic onpremises application to AWS.
+  - It is a web app with a load balancer, web server, application server, and relational database.
+  - Key requirement driving the migration is that app should perform better and be more elastic.
+  - Which of the architecture would meet these requirements?
+       - **Replatform the application as three tier application. Use Elastic load balancing for incoming requests. Use EC2 for web and application tiers. Use CloudWatch alarms and Auto Scaling for horizontal scaling at the web tier.**
+
+6. App runs on EC2 instances in an Auto Scaling group.
+  - When instances are terminated, the Systems operations team cannot determine the root cause, because the logs on the terminated instances are lost.
+  - How can root cause be determined?
+       - **Use Amazon Cloudwatch agent to push the logs to Amazon Cloudwatch logs.**
+
+7. Org has long running image processing app that runs on Spot instances that will be terminated when interrupted. 
+  - A highly available workload must be designed to respond to Spot Instance interruption notices. 
+  - The solution must include a two minute warning when there is not enough capacity. 
+  - How can these requirements be met?
+       - **Use Amazon CloudWatch Events to invoke an AWS Lambda function that can launch On-Demand Instances.**
+
+8. SA is designing a solution that can monitor memory and disk space utilization of all EC2 instances running Amazon Linux and Windows.
+  - Which solution meets this requirement?
+        - **Custom Amazon CloudWatch metrics**
+
+9. SA notices slower response times from an application.
+  - CloudWatch metrics on the MySQL RDS indicate Read IOPS are high and fluctuate significantly when the database is under load.
+  - How should the DB environment be re-designed to resolve the IOPS fluctuation?
+       - **Change the storage type to Provisioned IOPS.**
+
+10. SA is designing sol that includes a managed VPN connection.
+  - To monitor whether the VPN connection is up or down, architect should use:
+       - **the CloudWatch TunnelState Metric.**
+
+11. Company wants to use Amazon GuardDuty to detect malicious and unexpected activity.
+  - They want to use CloudWatch to ensure that when findings occur, remediation occurs automatically.
+  - Which cloudwatch feature you use to trigger AWS Lambda function to perform remediation?
+       - **Events**
+
+12. Design a new web app on Amazon EC2. 
+  - System must make application specific metrics, such as application security events, available to the sysops team.
+  - How do SA enable this in the design?
+       - **Install the Amazon CloudWatch Logs agent on the application instances. Design the application to store events in application log files.**
+
+13. Application calls service run by vendor. Vendor charges on the number of calls. Finance department needs to know number of calls that are made to the service to validate the billing statements.
+  - How can SA design a system to durably store number of calls without requiring changes to the application?
+       - **Publish a custom Amazon CloudWatch metric that counts calls to the service.**
+
+14. S3 data stored with encryption at rest:
+  - Implementing data lake solution on S3
+  - Data lake has two types of encryption:  Server side and Client side
+  - Data stored in S3 must be encrypted at rest. Which option can achieve this?
+        - **Use S3 server-side encryption with customer-provided keys (SSE-C).**
+        - **Use client-side encryption before ingesting the data to Amazon S3 using encryption keys.**
+
+15. Encrypt data in S3.
+  -  Encryption keys generated and managed on-premises. How can SA meet security requirements?
+        - **SSE-C: Server-side encryption with customer-provided encryption keys**
+
+## Simple Storage Service (S3)
+
+1. S3 can handle at least 3,500 PUT/COPY/PASTE/DELETE and 5,500 GET/HEAD requests per second per prefix in a bucket.
+2. S3 is storage solution.
+3. Glacier is archive solution.
+4. S3 is an object storage.
+5. 
+
+
+Scenarios:
+
+1. SA is architecting a workload that requires a performant object based storage system that must be shared with multiple EC2 instances.
+  - Company expects its user base to increase five times over one year.
+  - Its application is hosted in one region and users RDS MySQL DB, an ELB ALB, and ECS to host the website and its micro services.
+  - Which design changes should SA recommend to support expected growth?
+        -**- Move static files from ECS to Amazon S3.**
+
+2. Company is evaluating S3 as data storage solution for their daily analyst reports.
+  - Company has implemented stringent requirements concerning the security of the data at rest.
+  - Specifically, CISO asked for the use of envelope encryption with separate permissions  for the use of an envelope key, automated rotation of the encryption keys and visibility into when an encryption key was used and by whom.
+  - Which steps should SA take to satisfy the security requirements requested by CISO?
+       - **Create S3 bucket to store reports and use Server-side encryption with AWS KMS-Managed keys (SSE-KMS).**
+
+S3 Pre-signed URLS:
+
+1. Prevent unauthorized access to the reports.
+2. Temporary access to protected assets.
+3. Simple, occassional sharing of private files.
+4. Frequent programmatic access to view or upload a file in an application.
+5. Thumbnail easily created from originals if they are accidentally deleted.
+
+Scenarios:
+
+3. App provides users to download private and personal files. 
+  - Web server is overwhelmed with serving files for download.
+  - It should reduce web server load and allow users to download only their files.
+       - **Store files in S3 and have app generate S3 pre-signed URL for the user to download.**
+
+4. Photo sharing website allows to generate thumbnail images of photo stored in S3.
+  - DynamoDB table maintains location of photos and thumbnail are easily created from originals if accidentally deleted.
+  - Storing thumbnails images at lowest cost
+        - **S3**
+
+5. Thousands of files stored in S3 bucket has well defined access pattern.
+  - Files accessed multiple times a day for first 30 days.
+  - Files rarely accessed in 90 days.
+  - After that files never accessed again.
+  - During first 120 days accessing files needs to take no more than few seconds.
+  - Which lifecycle policy to minimize cost based on access pattern?
+        - **S3 standard storage for first 30 days.Then move files to S3 Standard IA for next 90 days. Allow files to expire after that.**
+
+6. SA is designing new social media application.
+  - App must provide secure method of uploading profile photos.
+  - Each user should be able to upload a photo into shared storage location for one week after their profile is created.
+  - Which approach will meet all of these requirements?
+       - **Use Amazon S3 with default private access policy and generate pre-signed URLs each time a new site profile is created.**
+
+S3 standard storage:
+
+1. Files accessed multiple times a day for first 30 days.
+
+Scenario:
+
+7. Creating serverless web app
+  - Access mapping data in hundreds of data files, each containing 30 KB of data.
+  - Storage expected to grow to hundreds of terabytes.
+  - Most cost effective storage.
+       - **S3 standard storage**
+
+8. SA is building online shopping app where users be able to browse items, add items and purchase items.
+  - Images of items stored in S3 buckets organized by item category.
+  - During testing, item images are still available to some users on deletion.
+  - What is the flaw in design?
+        - **S3 Delete requests are eventually consistent, which may cause other users to view items that have already been purchased.**
+
+S3 Standard Infrequent access:
+
+1. Files rarely accessed in next 90 days.
+2. Documents must be retreived immediately.
+3. Highly available access but not frequent access.
+4. Immediate access for batch jobs.
+5. Media companies have more than 100TB of data to be stored and retrieved infrequently.
+
+Scenarios:
+
+9. Company uses S3 for Backup of on premises environment.
+  - Data must be retained at least for 7 years.
+  - Data infrequently accessed for 35 days but needs to be instantly available.
+  - After 35 days, data is rarely accessed
+  - Most cost effective solution.
+       - **Change backup so data goes to S3 Standard IA directly**
+       - **Creates an S3 lifecycle policy that moves data to GLACIER storage class after 35 days.**
+
+10. Company wants to store data for 5 years.
+  - Company need to have immediate and highly available access to data in any point of time but not require frequent access.
+  - What lifecycle action should be taken to meet requirements while reducing costs?
+        - **Transition objects from S3 standard to S3 standard-IA.**
+
+11. Company designs new service receiving locations updates from 3,600 rental cars every hour.
+  - Cars upload location to S3 bucket.
+  - Each location must be checked for distance from original rental location.
+  - Which service process updates and scale automatically?
+        - **S3 events and AWS lambda**
+
+12. SA is designing a system that will store personally identifiable information (PII) to S3.
+  - Due to compliance and regulatory requirements, both the master keys and unencrypted data should never be sent to AWS.
+  - Which S3 encryption should SA choose?
+       - **S3 client-side encryption with client-side master key**
+
+13. Customer has service based out of Oregon, us and Paris, France.
+  - App is storing data in S3 in Oregon and data is updated frequently.
+  - Paris is experiencing slow response time when retrieving objects.
+  - What should SA do to resolve slow response time for Paris office?
+        - **Set up S3 bucket in Paris, and enable cross-region replication from Oregon bucket to Paris bucket.**
+
+14. Company uses S3 for storing variety of files.
+  - SA needs to design a feature that allow users to instantly restore any deleted files within 30 days of deletion.
+  - Which is most cost efficient solution?
+       - **Enable versioning and create lifecycle policy to remove expired versions after 30 days.**
+
+15. One company wants to share contents of S3 bucket with other company.
+  - sec mandate that only other companies AWS account has access to contents of S3 bucket.
+  - Which feature allow secure access to S3 bucket.
+       - **Bucket policy**
+
+16. Company policy requires that all data stored in S3 is encrypted.
+  - Company wants to use option of least overhead and do not want to manage any encryption keys.
+  - Which option meets companys requirement?
+       - **Server Side Encryption (SSE-S3)**
+
+17. Company wants to ensure that all files created in S3 bucket us-east-1 are also available in another bucket in ap-southeast-2.
+  - Which option represents the simplest way to implement these changes?
+        - **Enable versioning and configure cross-region replication from bucket in us-east-1 to bucket in ap-southeast-2.**
+
+18. SA is architecting a workload that needs performant object based storage system that must be shared with multiple EC2 instances.
+  - Which AWS service meets these requirements?
+       - **Amazon S3.**
+
+19. Company has an app that store sensitive data. 
+  - Companies are required to store multiple copies of its data.
+  - What would be MOST resilient and cost effective option to meet this requirement?
+       - **S3**
+
+20. SA is designing solution to store large quantities of event data in S3.
+  - Architect anticipates that workload will exceed 100 requests each second.
+  - What should SA do in S3 to optimize requirements?
+       - **Randomize a key name prefix.**
+
+21. Companies dev teams plans to create S3 bucket containing millions of images.
+  - Team want to maximize read performance of S3.
+  - Which naming scheme company should use?
+       - **Add a date as the prefix.**
+
+22. Company storing app data in S3 buckets across multiple AWS regions.
+  - Company policy requires that encryption keys be generated at company headquarters, but encryption keys be stored in AWS after generation.
+  - SA plans to configure cross region replication.
+  - Which sol will encrypt data requiring least amount of operational overhead?
+       - **Configure S3 buckets to use Server-side encryption with AWS KMS-Managed Keys (SSE-KMS) with imported key material in both regions.**
+
+23. SA must design a storage solution for incoming billing reports in CSV format.
+  - Data does not need to be scanned frequently and is discarded after 30 days.
+  - Which service will be MOST cost-effective in meeting these requirements?
+       - **Write the files to an S3 bucket and use Amazon Athena to query the data.**
+
+24. S3 bucket have the policy to delete the files automatically after 30 day retention period has elapsed further saving money.
+  - Company uses S3  for storing variety of files.
+  - SA needs to  design feature that will allow users to instantly restore any deleted files within 30 days of deletion. 
+  - Which is the most cost efficient solution ?
+       - **Enable versioning and create a lifecycle policy to remove expired versions after 30 days.**
+
+25. Company generates invoices and makes it available online.
+  - Stored as PDF in S3 bucket.
+  - Customers see invoice during start of the month.
+  - Past invoice needs to be immediately available.
+  - Concerns over rising storage costs as company gains more customers.
+  - Most cost effective method to store data?
+       - **S3 for current invoices**
+       - **Setup lifecycle rules to migrate invoices to S3 Standard IA after 30 days.**
+
+26. App produces monthly reports that must be immediately accessible up to 7 days.
+  - After 7 days, data can be archived.
+  - Archived data be retrievable within 24 hrs of request.
+  - Most cost effective approach to satisfy compliance requirement?
+        - **Store data in S3 standard storage with lifecycle rule to transition the data to GLACIER storage after 7 days.**
+
+Glacier storage:
+
+1. Transition data to Glacier storage after 7 days.
+2. Archived data: ex after 7 days, data can be archived.
+3. Data is rarely accessed after 35 days.
+4. Readily available means glacier storage.
+5. Cost of Glacier is less than IA.
+6. Customers can store data for as little as $1 per terabyte per month. Data stored in Glacier is immutable, meaning after an archive is created it cannot be updated.
+
+
+Scenario:
+
+27. App generates audit logs of operational activities
+  - Compliance requirements mandates that the app retains logs for 5 years.
+  - How can requirements be met?
+       - **Save the logs in an amazon glacier vault and use the vault lock feature.**
+
+28. Company processed 10TB of raw data to generate quarterly reports.
+  - Unlikely to be used again, raw data needs to be preserved for compliance and auditing purpose.
+  - Most cost effective way to store data in aws?
+        - **Glacier**
+
+29. Media company store 10TB of audio recordings:
+  - Retreival happens infrequently and requestors agree on an 8-hour turnaround time.
+  - What is the MOST cost effective solution to store files?
+       - **Amazon Glacier**
+
+30. SA is asked to improve fault tolerance of existing python application.
+  - The web application places 1MB images in S3 bucket.
+  - App then uses single T2.large instance to transform image to include watermark with companys brand before writing the image back to S3 bucket.
+  - What should SA recommend to increase fault tolerance of the solution?
+        - **Convert the code to lambda function triggered by S3 events.**
+
+## Amazon Athena
+
+1. Company wants to minimize infrastructure.
+2. Serverless service.
+3. Does not need any infrastructure to create, manage of scale datasets.
+4. Works directly on top of S3 data sets.
+5. Creates external tables and therefore does not manipulate S3 data sources.
+
+## Virtual Private Cloud
+
+1. Data never leave AWS network - VPC endpoint.
+2. Latest generation of VPC endpoints used by AWS Systems manager are powered by Private link.
+3. Eggress only for IPv6.
+4. AWS Privatelink provides private connectivity between VPCs, AWS services, and on-premises applications, securely on the Amazon network. PII
+5. VPC flog logs is a feature that enable to capture information about IP traffic going to and from network interfaces in your VPC. 
+6. VPC endpoint enables privately connect your VPC to supported AWS services and VPC endpoint services powered by AWS private link without requiring an internet gateway, NAT device, VPN connection or AWS Direct Connect connection.
+7. Flow logs is the only service that allows you to monitor the flow of Network IP addresses.
+8. VPC peering is a communication within AWS accounts and internet access is not required.
+9. You can specify allow rules but not deny rules.
+10. A VPC endpoint enables you to privately connect your VPC to supported AWS services and VPC endpoint services powered by AWS PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection. Instances in your VPC do not require public IP addresses to communicate with resources in the service. Traffic between your VPC and the other service does not leave the Amazon network.
+11. If you host a website on multiple Amazon EC2 instances, you can distribute traffic to your website across the instances by using an Elastic Load Balancing (ELB) load balancer.
+
+Scenarios:
+
+1. App server should be in private subnet without access to the Internet.
+  - Sol must retrieve and upload files to S3 bucket.
+        - **Use Amazon S3 VPC endpoints.**
+
+2. App running in private subnet accesses DynamoDB table.
+  - There is security requirement that data never leaves AWS network.
+  - How is this requirement met?
+        - **Create a VPC endpoint for DynamoDB and configure the endpoint policy**
+
+3. SA creating an application running on VPC that needs to access AWS Systems Manager Parameter Store.
+  - Network security rules prohibit route table entry with 0.0.0.0./0 destination
+  - Which infrastructure allows access to AWS service meeting requirements?
+       - **AWS PrivateLink**
+
+4. Design VPC that requires access to remote API server using IPv6.
+  - Resources within the VPC should not be accessed directly from Internet.
+  - How can this be achieved?
+       - **Attach an egress-only internet gateway and update the routing tables.**
+
+5. Company wants to create app that transmit protected health information to thousands of service consumers in different AWS accounts.
+  - App servers will sit in private VPC subnets.
+  - Routing for the app must be fault tolerant.
+  - What to do to meet this requirement?
+       - **Create VPC endpoint service and grant permissions to specific service consumers to create a connection.**
+
+6. Security team reviewed their companys VPC flow logs and found that traffic is being directed to the internet.
+  - App in the VPC uses EC2 instances for compute and S3 for storage.
+  - Companys goal is to eliminate internet access and allow app to continue to function.
+  - What change should be made in VPC before  updating route table?
+       - **Create a VPC endpoint for Amazon S3 access.**
+
+7. Most secure way to allow applications to access service endpoints in the same region.
+       - **Use AWS PrivateLink**
+
+8. Credit card processing app hosted on an on-premises server, needs to communicate directly with the database hosted on EC2 instance running in an private subnet of vpc.
+
+  - Compliance req state that end to end communication should be encrypted.
+  - Which solution will ensure that this requirement is met?
+        - **Use HTTPS for traffic over the VPN connection between the VPC and the on-premises datacenter.**
+        - **Communication are encrypted and secured simply by using VPN.**
+
+9. SA is given following requirements for a companys VPC:
+    - Two tiered app with web and db tier
+    - All web traffic to environment should be directed from internet to ALB
+    - Web servers and DB should not obtain public IP address or subnet with any other device.
+    - Environment be highly available within same VPC for all services.
+    - What is the min number of subnets that SA need for best practices?
+        - **6**
+        - 2 public subnets for ELB
+        - 2 private subnets for web server.
+        - 2 private subnets for databases.
+
+10. Company plans to use VPC to deploy web app consisting of ELB, a fleet of web and app servers, and RDS MySQL db that should not be accessible from the Internet.
+  - Proposed design must be highly available and distributed over two AZ.
+  - What is most  appropriate VPC design for this use case?
+       - **Two public subnet for ELB, two private subnets for web servers and two private subnets for RDS.**
+
+11. SA is designing an app on AWS that will connect to on-premise data center through VPN connection.
+  - Sol must be able to log network traffic over VPN. 
+  - Which service logs this network traffic?
+       - **Amazon VPC flow logs**
+
+12. SA is designing VPC.
+  - App in VPC must have private connectivity to DynamoDB in the same AWS region.
+  - Design should route DynamoDB traffic through
+       - **VPC endpoint**
+
+13. Company requires that source, destination and protocol of all IP packets be recorded when traversing a private subnet.
+  -  What is the MOST secure and reliable method of accomplishing this goal?
+       - **Create VPC flow logs on the subnet.**
+
+14. SA is designing a new app that needs to access data in different AWS account located in the same region.
+  - The data must not be accessed over the Internet.
+  - Which solution will meet these requirements with LOWEST cost?
+       - **Establish a VPC peering connection between accounts.**
+
+15. SA is designing network architecture for an app that has compliance requirements.
+  - App will be hosted on EC2 instances in private subnet and will be using S3 for storing data.
+  - Compliance requirements mandate that the data cannot traverse the public internet.
+  - What is the MOST secure way to satisfy this requirement?
+       - **Use a VPC endpoint.**
+
+16. Dev team is building an app with front end and back end app tiers.
+  - Each tier consists of EC2 instances behind an ELB CLB.
+  - Instances run in Auto scaling group across multi AZ.
+  - Network team has allocated the 10.0.0.0/24 address space for this app.
+  - Only the front end load balancer should be exposed to the Internet.
+  - There are concerns about limited size of address space and ability of each tier to scale.
+  - What should the VPC subnet design be in each AZ? 
+       - **One public subnet for the load balancer tier, one public subnet for the front-end tier, and one private subnet for the backend tier.**
+
+17. SA is designing VPC. Applications in VPC must have private connectivity to DynamoDB in the same AWS region. The design should route DynamoDB traffic through:
+       - **VPC endpoint**
+
+18. Company hosts a popular web app. The web app connects to DB running in private VPC subnet. The web servers must be accessible only to customers on an SSL connection. RDS MySQL DB server must be accessible only from web servers. How should SA design a solution to meet requirements without impacting running apps?
+        - **Open an HTTPS port on the security group for web servers and set the source to 0.0.0.0/0. Open the MySQL port on the database security group and attach it to the MySQL instance. Set the source to Web Server Security Group.**
+
+19. A workload in an VPC consists of a single web tier server launched from a custom AMI. Session state is stored in a DB. How should a SA modify this workload to be both highly available and scalable?
+        - **Create a launch configuration with the AMI ID of the web server image. Create an Auto Scaling group using the newly-created launch configuration, and a desired capacity of two web servers across multiple Availability Zones. Use an ALB to balance traffic across the Auto Scaling group.**
+
+## Elastic Beanstalk
+
+1. Automatically scales your app up and down based on your applications specific need using easily adjustable Auto scaling settings.
+2. With Elastic Beanstalk, your application can handle peaks in workload or traffic while minimizing your costs.
+3. Automatically handles deployment, from capacity provisioning, load balancing, auto-scaling to application health monitoring, you just have to concentrate on your code.
+4. Elastic Beanstalk is a AWS managed service that can do scalability. No auto scaling required.
+
+Scenarios:
+
+1. During review of Business applications, SA identifies critical application with relational database that was built by business user and is running on users desktop.
+  - To reduce the risk of business interruption, SA wants to migrate application to highly available, multi-tiered solution in AWS.
+  - How can SA accomplish this with least disruption to business?
+       - **Use AWS DMS to migrate the backend database to an Amazon RDS Multi-AZ DB instance. Migrate the application code to AWS Elastic Beanstalk**
+
+2. Company has web app running in docker container that connects to a MySQL server in an on-premises data center. 
+  - Deployment and maintenance of this app is becoming time consuming and slowing down new feature releases.
+  - The company wants to migrate app to AWS and use services that helps facilitate infrastructure management and deployment.
+  - Which architectures should company consider on AWS?
+       - **Amazon ECS for the web application, and an Amazon RDS for MySQL for the database.**
+       - **AWS Elastic Beanstalk Docker Single Container for the web application, and an Amazon RDS for MySQL for the database.**
+
+3. Company uses Elastic Beanstalk to deploy a web app running on c4.large instances. 
+  - Users are reporting high latency and failed requests.
+  - Further investigation reveals that the EC2 instances are running at or near 100% CPU utilization.
+  - What should SA do to address the performance issues?
+       - **Modify the scaling triggers in Elastic Beanstalk to use the CPUUtilization metric.**
+
+4. SA needs to deploy a node.js based web application that is highly available and scales automatically.
+  - Marketing team needs to rollback on app releases quickly, and they need to have an operational dashboard.
+  - The Marketing team does not want to manage deployment of OS patches to the linux servers.
+  - Which AWS service will satisfy these requirements?
+        - **AWS Elastic Beanstalk**
+
+5. SA is developing a new web app on AWS
+  - The services must scale to support an increasing load.
+  - The architect wants to focus on software development and deploying new features rather than provisioning or managing servers.
+  - Which AWS service is appropriate?
+        - **Elastic Beanstalk**
+
+6. Which service should org use if it requires an easily managed and scalable platform to host its web app running on Nginx?
+       - **AWS Elastic Beanstalk**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
