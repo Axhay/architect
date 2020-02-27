@@ -1321,6 +1321,326 @@ Scenario:
 
 ## NAT Gateway
 
+1. Application servers deployed in private subnet need to integrate with third party service via internet. Changes to provide outbound internet connectivity in VPC without inbound internet connectivity to application servers.
+       - **Create a NAT Gateway without attaching an Internet Gateway to the VPC.**
+
+## EC2 Instance and Instance Types
+
+1. "multicontainer-based" => EC2, path-base routing: ALB
+2. Default Termination Policy
+This section describes the default termination policy used by an Auto Scaling group when a scale-in event occurs. The default termination policy is designed to help ensure that your instances span Availability Zones evenly for high availability. The default policy is kept generic and flexible to cover a range of scenarios.
+With the default termination policy, the behavior of the Auto Scaling group is as follows:
+
+1) Determine which Availability Zone(s) have the most instances, and at least one instance that is not protected from scale in.
+If there are multiple unprotected instances to choose from in the Availability Zone(s) with the most instances, an instance is selected for termination based on the following criteria (applied in the order shown).
+3. Scaling based on a schedule enables you to scale your application in response to predictable changes in demand. To use scheduled scaling, you create scheduled actions, which tell Spot Fleet to perform scaling activities at specific times. When you create a scheduled action, you specify the Spot Fleet, when the scaling activity should occur, minimum capacity, and maximum capacity. You can create scheduled actions that scale one time only or that scale on a recurring schedule.
+4. Sec groups are stateful and only accept Allow rules.
+5. Security Group: Traffic can be restricted by any IP protocol, by service port, and source/destination IP address (individual IP or CIDR block).
+6. Predictive Scaling, a feature of AWS Auto Scaling uses machine learning to schedule the right number of EC2 instances in anticipation of approaching traffic changes. Predictive Scaling predicts future traffic, including regularly-occurring spikes, and provisions the right number of EC2 instances in advance.
+
+Scenarios:
+
+1. Team has developed a new web application in AWS region that has three availability zones: AZ-a, AZ-b and AZ-c. Application need to be fault tolerant and needs at least six EC2 instances running at all times. Application must tolerate loss of connectivity to any AZ so that application can continue to run.
+       - **AZ-a with six EC2 instances, AZ-b with six EC2 instances, and AZ-c with no EC2 instances.**
+       - **AZ-a with three EC2 instances, AZ-b with three EC2 instances, and AZ-c with three EC2 instances.**
+
+2. Design multi-container based web application. Part of the web application, /order and /sale-event must scale independently while maintianing single fully qualified domain name. Which AWS service will help architect build this platform?
+       - **Amazon ELB Application Load Balancer**
+       - **Amazon EC2 Container Service**
+
+3. Environment has auto scaling group across two AZ referred to as AZ-a and AZ-b and default termination policy. AZ-a has four Amazon EC2 instances and AZ-b has three EC2 instances. No instance is protected from scale in. How will Auto Scaling proceed if there is a scale-in event?
+       - **Auto Scaling selects the Availability Zone with four EC2 instances and then continues to evaluate.**
+
+4. Company’s new web application running on EC2 across multiple AZ will be heavily accessed during regular business hours. After business hours, usage will be minimal. What fleet-scaling approach should be used to size the EC2 fleet to handle traffic demands?
+       - **Scheduled scaling**
+
+5. SA is designing an application that requires having six amazon EC2 instances running at all times. Application will be deployed in the sa-east-1 region which has three AZ. Which action will provide 100% fault tolerance and lowest cost in even that one AZ in region becomes unavailable?
+       - **Deploy three Amazon EC2 instances in sa-east-1a, three Amazon EC2 instances in sa-east-1b, and three Amazon EC2 instances in sa-east-1c**
+
+if one AZ goes down, 6 instances are still running
+
+6. Company is launching dynamic website and the Operations team expects up to 10 times the traffic on launch date. Website is hosted on EC2 instances and traffic is distributed by Amazon Route 53. SA must ensure that there is enough backend capacity to meet users demand. The operation team wants to scale down as quick as possible after launch. What is the most cost effective and fault tolerant solution that will meet company's needs?
+       - **Set up an Application Load Balancer to distribute traffic to multiple EC2 instances**
+       - **Set up an Auto Scaling group across multiple Availability Zones for the website, and create scale-out and scale-in policies**
+
+7. SA is designing new architecture that will use EC2 Auto Scaling group. Which of the following factors determine the health check grace period?
+       - **How much of the application code is embedded in the AMI.**
+       - **How long the bootstrap script takes to run.**
+
+8. How can a user track memory usage in EC2 instance?
+       - **Place an agent on the EC2 instance to push memory usage to an Amazon CloudWatch custom metric.**
+       Cloudwatch + Memory = Agent + Custom Metric
+
+9. Company running series of national TV campaigns. These 30-second ad will introduce sudden traffic peaks targeted at Node.js application. Company expects traffic to increase from five requests each minute to more than 5,000 requests each minute. Which AWS service SA uses to ensure traffic surges can be handled?
+       - **An Auto Scaling group for EC2 instances**
+
+10. Customer setup VPC with one private subnet and one public subnet with NAT gateway. VPC will contain a group of EC2 instances. All instances configure themselves at startup by downloading bootstrap script from S3 bucket with policy that allows access from customers Amazon EC2 instances and then deploys application through GIT.  SA is tasked with solution that provides highest level of security regarding network connectivity to EC2 instances. How can SA design infrastructure?
+        - **Place the Amazon EC2 instances in a private subnet, with no EIPs; route outgoing traffic through the NAT gateway**
+    EC2 instances running in private subnets of a VPC can now have controlled access to S3 buckets, objects, and API functions that are in the same region as the VPC.
+
+11. Data processing application runs on i3.large EC2 instance with single 100GB EBS gp2 volume. App stores temporary data in small database (less than 30 GB) located on EBS root volume. App is struggling to process data fast enough, and SA has determined that the I/O speed of temporary database is the bottleneck. What is the most cost-efficient way to improve DB response times?
+       - **Move the temporary database onto instance storage.**
+
+12. Web server will be provisioned on two EC2 instances with an ALB. Which config will allow traffic on HTTP and HTTPS when configuring security group to apply to each of these servers?
+        - **Allow incoming traffic to HTTP and HTTPS ports.**
+
+13. A company requires OS permission on a relational database server. What should a SA suggest as a configuration for highly scalable database architecture?
+       - **Multiple EC2 instances in a database replication configuration that uses two Availability Zones.**
+
+14. SA is concerned that the current security group rules for a DB tier are too permissive and may permit requests that should be restricted. Below are current security group permissions for the DB tier. Protocol: TCP, Port range: 1433 (MS SQL), Source: ALL. Currently, the only identified resource that needs to connect to the DB is the application tier consisting of an auto scaling group of EC2 instances. What changes can be made to this security group that would offer the users LEAST privilege?
+       - **Change the source to the security group ID attached to the application instances.**
+
+15. Company has a website running on EC2. The application DNS name points to an Elastic IP address associated with the EC2 instance. In the event of an attack on the website coming from a specific IP address, the company wants a way to block offending IP addresses. Which tool or service should SA recommend to block IP address?
+       - **Network ACL**
+
+16. Company wants to migrate a three-tier web app to AWS. Company wants to control the placement of the instances and have visibility into underlying sockets and cores for licensing purposes. Which compute model should a SA choose to accomplish this task?
+       - **EC2 Dedicated Hosts**
+
+17. SA is designing a service that must have 4 EC2 instances running between 8am and 6pm daily. Service requires one EC2 instance outside of those hours. What is the most cost effective way to provide enough compute?
+        - **Use one Amazon EC2 Reserved Instance and use an Auto Scaling Group scheduled action to add three EC2 On-Demand instances at 7:30 AM and remove three instances at 6:10 PM.**
+
+18. App is running on EC2 instances behind an ALB. The instances run in an Auto Scaling group across multiple AZ. Four instances are required to handle predictable traffic load. SA wants to ensure that the operation is fault tolerant up to the loss of one AZ. Which is the most cost efficient way to meet these requirements?
+       - **Deploy two instances in each of three Availability Zones.**
+
+19. SA needs to design a centralized logging solution for a group of web applications running on EC2 instances. The sol requires minimal development effort due to budget constraints. Which of the following should the Architect recommend?
+       - **Install and configure Amazon CloudWatch Logs agent in the Amazon EC2 instances.**
+
+20. Employees from several companies use an application once a year during a specific 30-day period. The periods are different for each company. Traffic to the application spikes during these 30-day periods. How can the application be designed to handle these traffic spikes?
+       - **Use an Auto Scaling group to scale the number of EC2 instances to match the site traffic.**
+
+21. SA is about to deploy an API on multiple EC2 instances in Auto Scaling group behind an ELB. The support team has following operational requirements: 
+They get an alert when the requests per second go over 50,000, they get an alert when latency goes over 5 seconds, they can validate how many times a day users call the API requesting highly sensitive data. Which combination of steps does SA need to take to satisfy these operational requirements?
+       - **Create a custom CloudWatch metric to monitor the API for data access.**
+       - **Ensure that detailed monitoring for the EC2 instances is enabled.**     
+
+22. An interactive, dynamic web runs on EC2 instances in single subnet behind an ELB CLB. Which design changes will make the site more highly available?
+       - **Move some Amazon EC2 instances to a subnet in a different way.**
+
+23. Multi-tiered architecture for an application with public facing web-tier. EC2 instances running in application tier to not be accessible directly from the internet.
+       - **Deploy the web and application instances in a private subnet. Provision an Application Load Balancer in the public subnet. Install an internet gateway and use security groups to control communications between the layers.**
+
+24. Company creates business critical 3D images every night. Images are batch-processed every Friday and require an uninterrupted 48 hours to complete. What is the most cost effective EC2 pricing model for this scenario?
+       - **Scheduled Reserved Instances**
+
+25. SA is designing a highly available web application on AWS. The data served on the website is dynamic and is pulled from DynamoDB. All users are geographically close to one another. How can SA make the application highly available?
+        - **Host the application on EC2 instances across multiple Availability Zones. Use an Auto Scaling group coupled with an Application Load Balancer.**
+
+26. App runs on EC2 instance behind ELB ALB. Instances run in an EC2 Auto scaling group across multiple AZ. App provides a RESTful interface with both syn and async operations. The asyn operations require up to 5 mins to complete. Although app must remain available at all times, after bus hours, the traffic going to app is greatly reduced and often results in Auto Scaling group running the minimum number fo On-Demand Instances. What should SA recommend to optimize the cost of the environment after business hours?
+       - **Purchase Reserved Instances for the minimum number of Auto Scaling instances.**
+  
+  application must remain available at all times" = reserved instances for the time it is running.
+
+  ## Security Groups and ALB
+
+  1. Application Load Balancers have no IP address so using the security group for it is the best fit in this case.
+  2. Unlike a traditional web hosting model, inbound network traffic filtering should not be confined to the edge; it should also be applied at the host level. Amazon EC2 provides a feature named security groups. A security group is analogous to an inbound network firewall, for which you can specify the protocols, ports, and source
+  IP ranges that are allowed to reach your EC2 instances. You can assign one or more security groups to each EC2 instance. Each security group routes the appropriate traffic to each instance. Security groups can be configured so that only specific subnets or IP addresses have access to an EC2 instance. Or they can reference other security groups to limit access to EC2 instances that are in specific groups.
+  3. ALB doesn't have an IP Address.
+  4. Using Redis AUTH command can improve data security by requiring the user to enter a password before they are granted permission to execute Redis commands on a password-protected Redis server
+  5. Security Groups only allow you to 'Allow' traffic, not 'Deny' it (making Answer B not possible)
+  https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html
+   Security Group Basics
+   The following are the basic characteristics of security groups for your VPC:
+   You can specify allow rules, but not deny rules.
+
+  Scenarios:
+
+  1. Application runs on VPC  on EC2 instance behind ALB. Traffic to EC2 instances must be limited to traffic from ALB. Based on these requirements, the security group configuration must allow traffic from:
+       - **the security group attached to the Application Load Balancer.**
+
+  2. SA is designing architecture for a web application that will be hosted on AWS. Internet users will access applications using HTTP and HTTPS. How to design traffic control requirements?
+        - **Allow inbound ports for HTTP and HTTPS in the security group used by the web servers.**
+  
+  3. SA is designing multi-tier application consisting of ALB, RDS instance, Auto scaling group on EC2 instance. Each tier is in separate subnet. There are some EC2 instances in the subnet that belong to another application. RDS database instance should accept traffic only from EC2 instances in Auto scaling group. What to do to meet these requirements?
+        - **Configure the inbound rules on the security group associated with the RDS database instance. Set the source to the security group associated with instances in the Auto Scaling group**
+  
+  4. SA is designing an application that will run on ECS behind an ALB. For security reasons, EC2 host instances for the ECS cluster are in private subnet. What to do to ensure the incoming traffic to host instances is from ALB only?
+        - **Modify the security group used by the EC2 cluster to allow incoming traffic from the security group used by the ALB only.**
+  
+  5. Organization is deploying ElastiCache for Redis and requires password protection to improve their data security posture. Which solution should a SA recommend?
+        - **Redis Auth**
+  
+  6. Web app is running on EC2 instances behind an Elastic Load balancing ALB. EC2 instances should receive no traffic, except for web requests to the application. Based on these requirements, what security group rules should be put on the EC2 instances?
+       - **An inbound rule allowing traffic from the security group attached to the ALB**
+
+  7. SA is designing three-tier web app that includes an Auto Scaling group of EC2 instances running behind ELB Classic Load Balancer. Sec team requires that all web servers to be accessible only through a Load Balancer, and that none of the web servers are directly accessible from Internet. How should Architect meet these requirements?
+       - **Configure the web tier security group to allow only traffic from the ELB Classic Load Balancer.**
+  
+  8. SA needs to allow developers to have SSH connectivity to web servers. Requirements are as follows: limit access to users origination from corporate network, web servers cannot have SSH access directly from the internet, web servers reside in a private subnet. Which combination of steps must SA complete to meet these requirements?
+        - **Create a bastion host with security group rules that only allow traffic from the corporate network.**
+        - **Configure the web servers' security group to allow SSH traffic from a bastion host.**
+  
+  9. Two auto scaling apps, A and B, currently run within a shared set of subnets. SA wants to make sure that app A can make request to app B, but app B should be denied from making request to app A. Which is the simplest sol to achieve this policy?
+        - **Using security groups that reference the security groups of the other application**
+  
+  10. Company hosts a two-tier app that consists of publicly accessible web server that communicates with private database. Only HTTPS port 443 traffic to the web server must be allowed from the internet. Which of the following options will achieve these requirements?
+        - **Security group rule that allows inbound Internet traffic for port 443.**
+        - **Network ACL rule that allows port 443 inbound and all ports outbound for Internet traffic.**
+      A = Inbound on Port 443 is fine as Security Groups are stateful (allow the traffic to return to the remote party without an explicit rule)
+      C = Inbound 443 on the Network ACL is a given, however, Network ACL's are stateless and therefore need configuring. In this case, the web server replies on a range of ports and therefore it is required that they are all open rather than simply 443 as stated in answer E.
+
+  11. SA is designing a three-tier web app. The architect wants to restrict access to the DB tier to accept traffic from app servers only. However, these app servers are in an Auto Scaling group and may vary in quantity. How should SA configure DB servers to meet the requirements?
+        - **Configure the database security group to allow database traffic from the application server security group.**
+        simple way to execute the solution via security group.
+  
+## CloudTrail
+
+1. Once you enable Cloudtrail on a root account, it will log all API interactions on the account and it will also propagate automatically to any new region defined in the account.
+
+Scenarios:
+
+1. Client reports they want to see an audit log of any changes made to AWS resources in their account. What can clients do to achieve this?
+       - **Enable AWS CloudTrail logs to be delivered to an Amazon S3 bucket**
+       CloudTrail ~ audit
+
+2. Company is using AWS KMS to secure their RDS DB.  An auditor has recommended that the company log all use of their AWS KMS keys. What is the SIMPLEST solution?
+       - **Use AWS CloudTrail to log AWS KMS key usage.**
+Built-in auditing
+AWS KMS is integrated with AWS CloudTrail to record all API requests, including key management actions and usage of your keys.
+
+3. SA needs to design a solution that will enable security team to delete, review and perform root cause analysis of security incidents that occur in cloud environment. 
+ - SA must provide a centralized view of all API events for current and future AWS regions.
+ - How should SA accomplish this task?
+       - **Enable AWS CloudTrail by creating a new trail and apply the trail to all regions.**
+
+## Kinesis
+
+1. Kinesis=event=1000 request
+2. Amazon Kinesis Data Firehose is the easiest way to reliably load streaming data into data lakes, data stores, and analytics tools. ... It is a fully managed service that automatically scales to match the throughput of your data and requires no ongoing administration.
+
+Scenarios:
+
+1. SA designed a system based on Kinesis Data Streams.
+  - After workflow was put in production, company noticed it performed slowly and identified Kinesis Data Streams as the problem.
+  - One of the streams has a total of 10 Mb/s throughput.
+  - What should SA do to improve performance?
+       - **Run the UpdateShardCount command to increase the number of shards in the stream**
+  Shards scale linearly, so adding shards to a stream will add 1MB per second of ingestion, and emit data at a rate of 2MB per second for every shard added. Ten shards will scale a stream to handle 10MB (10,000 PUTs) of ingress, and 20MB of data egress per second"
+
+2. Company is building a critical ingestion service on AWS that will receive 1,000 incoming events per second.
+ - The events must be processed in order, and no events may be lost.
+ - Multiple applications need to process each event.
+ - The company will expose the service as RESTful calls through API gateway.
+ - What should SA use to receive the events based on these requirements?
+       - **Amazon Kinesis Data Stream**
+   Kinesis=event=1000 request
+   
+3. SA is designing a microservice to process records from Kinesis Streams. 
+ - The metadata must be stored in Amazon DynamoDB. 
+ - Microservice must be capable of concurrently processing 10,000 records daily as they arrive in the Kinesis stream.
+ - The MOST scalable way to design the microservice is:
+      - **As a Docker container running on Amazon ECS.**
+  Docker makes it easy to build and run distributed microservices architecures, deploy your code with standardized continuous integration and delivery pipelines, build highly-scalable data processing systems, and create fully-managed platforms for your developers. Docker also provides big data processing as a service. (https://aws.amazon.com/docker/)
+
+4. Org must process a stream of large-volume hashtag data in real time and needs to run custom SQL queries on the data to get insights on certain tags. 
+ - The org needs this solution to be elastic and does not want to manage clusters. 
+ - Which of the AWS services meets these requirements?
+       - **Amazon Kinesis Data Analytics**
+  Input – The streaming source for your application. You can select either a Kinesis data stream or a Kinesis Data Firehose data delivery stream as the streaming source. In the input configuration, you map the streaming source to an in-application input stream. The in-application stream is like a continuously updating table upon which you can perform the SELECT and INSERT SQL operations. In your application code, you can create additional in-application streams to store intermediate query results.
+
+5. Online company wants to conduct real-time sentiment analysis about its products from its social media channels using SQL. 
+ - Which of the following solutions has the LOWEST cost and operational behavior?
+        - **Configure the input stream using Amazon Kinesis Data Streams. Use Amazon Kinesis Data Analytics to write SQL queries against the stream.**
+
+6. Company must collect temperature data from thousands of remote weather divisions. 
+ - The company must also store this data in a data warehouse to run aggregations and visualizations.
+ - Which services will meet these requirements?
+       - **Amazon Kinesis Data Firehouse**
+       - **Amazon Redshift**
+    collect = kinesis
+    Data warehouse = redshift
+
+7. App is running on EC2 instance in private subnet.
+ - App needs to read and write data into Kinesis Data Streams, and corporate policy requires that this traffic should not go to the Internet.
+ - How can these requirements be met?
+        - **Configure an interface VPC endpoint for Kinesis and route all traffic to Kinesis through the gateway VPC endpoint.**
+  
+8. Company website receives 50,000 requests each second, and company wants to use multiple apps to analyze navigation patterns of the users on their website so that the experience can be personalized.
+ - What can SA use to collect page clicks for the website and process them sequentially for each user?
+        - **Amazon Kinesis Stream**
+
+9. A user is testing a new service that receives location updates from 3,600 rental cars every hour. 
+ - Which service will collect data and autoscale to accommodate production overload?
+        - **Amazon Kinesis Firehose**
+    
+10. Manufacturing company captures data from machines running at customer sites. Currently, thousands of machines send data every 5 mins, and this is expected to grow to hundreds of thousands of machines in the near future.
+ - The data is logged with the intent to be analyzed in the future as needed. What is the SIMPLEST method to store this streaming data at scale?
+       - **Create an Amazon Kinesis Firehouse delivery stream to store the data in Amazon S3.**
+  
+## API Gateway
+1. Lambda and API because it has to scale based on demand. SPOT instances do work for stateless apps, should be in a comparable price versus lambda but the issue is elasticity and how these instances are going to be available (or the lack of certainty they will).
+2. Amazon API Gateway is a fully managed service that makes it easy for developers to create, publish, maintain, monitor, and secure APIs at any scale. With a few clicks in the AWS Management Console, you can create REST and WebSocket APIs that act as a “front door” for applications to access data, business logic, or functionality from your backend services, such as workloads running on Amazon Elastic Compute Cloud (Amazon EC2), code running on AWS Lambda, any web application, or real-time communication applications.
+API Gateway handles all the tasks involved in accepting and processing up to hundreds of thousands of concurrent API calls, including traffic management, authorization and access control, monitoring, and API version management. API Gateway has no minimum fees or startup costs.
+
+Scenario:
+
+1. Company developing new stateless web service with low memory requirements. Service needs to scale based on demand.
+ - What is most cost effective solution?
+       - **Deploy the application onto AWS Lambda with access through Amazon API Gateway**
+
+2. App running on AWS lambda requires an API key to access third party service. 
+ - The key must be stored securely with audited access to Lambda function only.
+ - What is the most secure way to store the key?
+       - **As a secure string in AWS Systems Manager Parameter Store**
+
+3. SA must select most cost efficient architecture for a service that responds to web requests.
+ - These web requests are small and query DynamoDB table.
+ - The request rate ranges from zero to several hundred each second, without any predictable patterns.
+ - What is most cost efficient architecture for this service?
+       - **API Gateway/AWS Lambda**
+
+3. Company plans to migrate a website to AWS to use serverless architecture. Website contains both static and dynamic content and is accessed by users across the world.
+ - The website should maintain sessions for returning users to improve the user experience.
+ - Which service should SA use for cost efficient solution with Lowest latency?
+       - **Amazon S3, Amazon CloudFront, AWS Lambda, Amazon API Gateway, and Amazon DynamoDB.**
+CloudFront is needed because they want to cache static & dynamic content... this is why.
+
+4. Part of migration strategy, SA needs to analyze workloads that can be optimized for performance and cost.
+ - SA has identified a stateless app that serves static content as potential candidate to move to cloud. 
+ - SA has flexibility to choose an identity sol between facebook, twitter and amazon.
+ - Which AWS sol offers flexibility and ease of use, and the LEAST operational overhead for this migration?
+       - **Use Amazon Cognito for managing identities, and migrate the application to run on Amazon S3, Amazon API Gateway, and AWS Lambda.**
+Amazon Cognito identity pools integrate with Facebook to provide federated authentication for your mobile application users.
+EC2 vs Lambda = Least operation overhead - go for server less i.e. Lambda
+
+5. Company has popular multi-player mobile game hosted in its on-premises datacenter. 
+ - The current infrastructure can no longer keep up with the demand and the company is considering a move to the cloud.
+ - Which solution should a SA recommend as the MOST scalable and cost-effective solution to meet these needs?
+       - **AWS Lambda and Amazon API Gateway**
+  API Gateway handles all the tasks involved in accepting and processing up to hundreds of thousands of concurrent API calls, including traffic management, authorization and access control, monitoring, and API version management. API Gateway has no minimum fees or startup costs. You pay only for the API calls you receive and the amount of data transferred out and, with the API Gateway tiered pricing model, you can reduce your cost as your API usage scales.
+
+  Aws Lambda:
+  Case study highlights"from several hours to just over 10 seconds, and reduced infrastructure and operational costs." Most gaming website using Lambda.
+  https://aws.amazon.com/lambda/resources/customer-case-studies/
+
+6. A retail company has sensors placed in its physical retail stores.
+ - The sensors send messages over HTTP when customers interact with in-store product displays. 
+ - SA needs to implement a system for processing those sensor messages, the results must be available for the Data analysis team.
+ - Which architecture to use to meet these requirements?
+       - **Implement an Amazon API Gateway to server as the HTTP endpoint. Have the API Gateway trigger an AWS Lambda function to process the messages, and save the results to an Amazon DynamoDB table.**
+
+7. SA is developing a new web application on AWS. 
+ - The architect expects the app to become very popular, so the app must scale to support the load. 
+ - Architect wants to focus on software development and deploying new features without provisioning or managing instances.
+ - What solution is appropriate?
+       - **Amazon API Gateway and AWS Lambda**
+  Both Lambda and API Gateway are serverless services, AWS will manage Provisioning and managing.
+
+8. As part of securing API layer built on API gateway, SA has to authorize users who are currently authenticated by an existing identity provider.
+ - The users must be denied access for a period of one hour after three unsuccessful attempts. How can SA meet these requirements?
+        - **Use an API Gateway custom authorizer to invoke an AWS Lambda function to validate each user's identity.**
+
+9. Customers own a simple API for their website that receives about 1,000 requests each day and has an average response time of 50 ms. It is currently hosted on one c4.large instance. Which changes to the architecture will provide high availability at the LOWEST cost?
+        - **Recreate the API using Amazon API Gateway and use AWS Lambda as the service backend.**
+  
+## NAT Gateway
+
+
+     
+
+
+
+
 
 
 
