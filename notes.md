@@ -1635,6 +1635,336 @@ EC2 vs Lambda = Least operation overhead - go for server less i.e. Lambda
   
 ## NAT Gateway
 
+1. Note If you have resources in multiple Availability Zones and they share one NAT gateway, in the event that the NAT gateway’s Availability Zone is down, resources in the other Availability Zones lose internet access. To create an Availability Zone-independent architecture, create a NAT gateway in each Availability Zone and configure your routing to ensure that resources use the NAT gateway in the same Availability Zone. 
+2. Connect to the Internet using Network Address Translation (private subnets) – Private subnets can be used for instances that you do not want to be directly addressable from the Internet. Instances in a private subnet can access the Internet without exposing their private IP address by routing their traffic through a Network Address Translation (NAT) gateway in a public subnet.
+3. Reason, The web Servers in web subnet can get Internet via ELB or IGW but private cannot go through ELB and IGW. They either need Nat Instance or Nat Gateway. since NAT instances are not mentioned then it must be Nat Gateway.
+4. you must always create your NAT gateway in a public subnet that already has a defined route to 0.0.0.0/0 through an internet gateway. and assign an Elastic IP to the NAT gateway.
+5. You have a limit on the number of NAT gateways you can create in an Availability Zone. 
+
+Scenarios:
+
+1. Application runs on EC2 instance in multiple AZ behind an ALB.
+ - Load balancer is in public subnets, EC2 instances are in private subnets and must not be accessible from the internet.
+ - EC2 instance must call external services on the internet.
+ - If one AZ become unavailable, remaining EC2 instances must still be able to call external services.
+        - **Create a NAT gateway in each AZ. Update the route tables for each private subnet to direct internet-bound traffic to the NAT gateway.**
+
+2. Design high performance computing job running on EC2 instances in private subnets.
+ - To allow application to download patches, infrastructure must be altered to allow instances to access external endpoints.
+ - Changes to infrastructure must involve minimal ongoing systems management effort. 
+ - What allows EC2 instances to access endpoint while meeting these requirements?
+       - **NAT gateway**
+
+3. Application has components running in public and private subnet. Components within the private subnet must connect to the internet to receive updates. How to do this without moving components into public subnet.
+       - **Add a NAT gateway to the public subnet and update the private subnet route table.**
+
+4. Convert single point of failure to highly available configuration. Current architecture contains Amazon EC2 instances with databases running in one AZ. Web tier resources have not been given public address, but still need internet access. Which solution to use to maintain high availability?
+       - **Use ELB Classic Load Balancer with the web tier. Deploy EC2 instances in two Availability Zones and enable Multi-AZ RDS. Deploy NAT gateways in both Availability Zones.**
+
+5. SA is designing application in AWS. Architect must not expose application or database tier over Internet for security reasons. App must be low-cost and have scalable front end. Database and application tier must have only one way internet access to download software and patch updates. Which solution helps to meet these requirements?
+       - **Use an ELB Classic Load Balancer as the front end for the application tier, and a NAT Gateway to allow Internet access for private resources.**
+
+6. App has web tier that runs on EC2 instances in public subnet. App tier instances run in private subnets across two AZ. All traffic is IPv4 only, each subnet has its own custom route table. New feature requires that app tier instances can call external service over the internet, however they must still not be accessible to internet traffic. What should be done to allow app servers to connect to internet maintain high availability and minimize admin overhead?
+       - **Add an Amazon NAT Gateway to each public subnet. Alter each private subnet's route table to include a route from 0.0.0.0/0 to the NAT Gateway in the same Availability Zone.**
+
+7. SA is working on PCI compliant architecture that needs to call an external service providers API. The external provider requires IP whitelisting to verify calling party. How should SA provide external party with IP addresses for whitelisting?
+        - **Deploy the Lambda function in private subnets and route outbound traffic through a NAT gateway. Provide the NAT gateway's Elastic IP address to the external service provider.**
+
+8. A company has instances in private subnets that require outbound access to the Internet. This requires:
+
+         - **Updating the route table associated with the subnet to point internet traffic through a NAT gateway.**
+
+9. SA is building multi-tier website. The web servers will be in public subnet, and the DB server will be in private subnet. Only web servers can be accessed from internet. DB servers must have internet access for software updates. Which solution meets the requirements?
+        - **Use a NAT Gateway.**
+
+10. SA is designing a web app. The web and app tiers need to access the Internet, but they cannot be accessed from the Internet. Which of the following steps is required?
+        - **Launch a NAT gateway in the public subnet and add a route to it from the private subnet.**
+
+11. SA plans to migrate NAT instances to NAT gateway. SA has NAT instances with scripts to manage high availability. What is the MOST efficient method to achieve similar high availability with NAT gateway?
+        - **Launch a NAT gateway in each Availability Zone.**
+
+You have a limit on the number of NAT gateways you can create in an Availability Zone. For more information, see Amazon VPC Limits.
+
+12. Internet facing multi-tier web app must be highly available. ELB CLB is deployed in front of the web tier. EC2 instances at the web app tier are deployed evenly across two AZ. DB is deployed using multi AZ. A NAT instance is launched for EC2 instances and DB resources to access the internet. These instances are not assigned with public IP addresses. Which component poses a potential single point of failure in this architecture? 
+        - **NAT instance**
+
+## Load Balancers
+
+1. An application load balancer can take the place of multiple individual classic load balancers to load balance microservices (e.g. running on AWS ECS) saving costs.
+Most importantly though, COST. Application Load Balancers cost $0.0252 per hour. Classic Load Balancers cost $0.028 per hour.                           A great article is here to refer: https://medium.com/cognitoiq/how-cognitoiq-are-using-application-load-balancers-to-cut-elastic-load-balancing-cost-by-90-78d4e980624b
+
+Scenarios:
+
+1. Organization hosts 10 microservices, each in autoscaling group behind individual CLB. Each EC2 instance running at optimal load. Which will allow organization to reduce costs without impacting performance?
+        - **Replace the Classic Load Balancers with a single Application Load Balancer.**
+
+2. SA plans to migrate load balancer tier from data center to AWS. Several websites have multiple domains that require secure load balancing. SA decides to use Elastic Load balancing application load balancers. What is most efficient method to achieve secure communication?
+       - **Create an SNI certificate and upload it to the Application Load Balancer**
+
+3. Company needs to use AWS resources to expand capacity for a website hosted in on-premises data center. AWS resources will include load balancers, auto scaling and EC2 instances that will access on premises database. Network connectivity has been established but no traffic is going to AWS environment. How should Route 53 be configured to distribute load to AWS environment?
+       - **Set up a weighted routing policy, distributing the workload between the load balancer and the on-premises environment.**
+       - **Set up an A record to point the DNS name to the IP address of the load balancer.**
+
+4. SA needs to deploy HTTP/HTTPS service on EC2 instances with support for WebSockets using load balancers. How can architect meet these requirements?
+      - **Configure an Application Load Balancer.**
+Http/Https are application layer (osi layer 7) 
+
+## ElasticCache
+
+1. Session data - Elasticache.
+2. Enabling ElastiCache Multi-AZ with automatic failover on your Redis cluster (in the API and CLI, replication group) improves your fault tolerance. This is true particularly in cases where your cluster's read/write primary cluster becomes unreachable or fails for any reason. Multi-AZ with automatic failover is only supported on Redis clusters that support replication
+3. Scheduled Instances are a good choice for workloads that do not run continuously, but do run on a regular schedule. For example, you can use Scheduled Instances for an application that runs during business hours or for batch processing that runs at the end of the week.
+If you require a capacity reservation on a continuous basis, Reserved Instances might meet your needs and decrease costs.
+
+
+Scenarios:
+
+1. Website keeps a record of user actions using GUID(globally unique identifier) retrieved from amazon aurora in place of username within the audit record. GUID content must not leave the Amazon VPC.
+ - With increase in web traffic, web servers and Aurora read replica has also increased to keep up with the user record reads for the GUID.
+ - To reduce read replica number while improving performance.
+        - **Deploy a Amazon ElastiCache for Redis server into the infrastructure and store the user name and GUID there. Retrieve GUID from ElastiCache  when required.**
+        (ElasticCache to improve performance and reduce read replica to retrieve GUID)
+
+2. Design application that has millions of users. SA needs to store session data. Which option is most performant?
+       - **Amazon ElastiCache**
+       
+3. Gaming application is heavily dependent on caching and uses ElastiCache for Redis. The application performance was recently degraded due to failure of cache node. What should SA recommend to minimize performance degradation in the future?
+       - **Configure ElastiCache Multi-AZ with automatic failover**
+
+4. Company wants to improve the performance of their web application after receiving customer complaints. An analysis concluded that the same complex database queries were causing increased latency. What should SA recommend to improve the applications performance?
+       - **Integrate Amazon ElastiCache into the application.**
+
+5. Social networking portal experiences latency and throughput issues due to an increased number of users. App servers use very large datasets from RDS DB, which creates a performance bottleneck on the DB. Which AWS service should be used to improve performance?
+       - **Amazon ElastiCache**
+
+6. Online retailer has series of flash sales occurring every friday. Sales traffic will increase during slaes only and platform handles increased load. Platform is three tier application. Web tier runs on EC2 instances behind ALB. Amazon Cloudfront is used to reduce web server load, but many requests for dynamic content must to go the web servers. What to do to web tier to reduce costs without impacting performance or reliability?
+       - **Purchase scheduled Reserved Instances.**
+"occurring every Friday" makes it a good candidate for scheduled reserved instances.
+
+7. SA is building a wordpress based web application hosted on AWS using EC2. This application serves as a blog for international internet security company. App must be geographically redundant and scalable. It must separate EC2 web servers from private RDS DB, highly available and it must support dynamic port routing. Which combination of AWS services or capabilities meet these requirements?
+        - **Amazon Route 53, Auto Scaling with an Application Load Balancer, and Amazon CloudFront**
+
+8. SA is building a wordpress based web application hosted on AWS using EC2. This application serves as a blog for an international internet security company. App must be geographically redundant and scalable. It must separate EC2 web servers from private RDS DB, highly available and it must support dynamic port routing. Which combination of AWS services or capabilities meet these requirements?
+       - **Amazon Route 53, Auto Scaling with an Application Load Balancer, and Amazon CloudFront**
+
+## SQS
+
+1. FIFO will deliver atleast once and no duplicates.
+2. Default queue could deliver twice can have duplicates.
+3. Decoupling this element and having it processed by separate workers allows the rest of the system to not suffer the impact of the slow-running worker.
+https://medium.com/@pablo.iorio/synchronous-and-asynchronous-aws-decoupling-solutions-1bbe74697db9
+
+
+Scenarios:
+
+1. User submit requests to a service that takes several minutes to process. SA needs to ensure that these requests are processed at least once, and that the service has the ability to handle large increases in number of requests. How should these requirements be met?
+       - **Put the requests into an Amazon SQS queue and configure Amazon EC2 instances to poll the queue**
+
+2. App uses an SQS queue as transport mechanism to deliver data to a group of EC2 instances for processing. Application owner wants to add mechanism to archive incoming data without modifying application code on EC2 instances. How can this application be re-architected to archive the data without modifying the processing instances?
+        - **Use an Amazon SNS topic to fan out the data to the SQS queue in addition to a Lambda function that records the data to an S3 bucket.**
+
+3. An organization runs an online voting system for TV program. During broadcasts, hundreds of thousands of votes are submitted within minutes and sent too a front end fleet of auto-scaled EC2 instances. The EC2 instances push the votes to an RDBMS database. The DB is unable to keep up with front-end connection requests. What is the MOST efficient and cost effective way of ensuring that votes are processed in timely manner?
+         - **Each front-end node should send votes to an Amazon SQS queue. Provision worker instances to read the SQS queue and process the message information into RDBMS database.**
+
+4. Restaurant reservation application needs to maintain waiting list. When a customer tries to reserve a table, and none are available, customer must be put on waiting list, and the application must notify the customer when a table becomes free. What service should the SA recommend to ensure that the system respects the order in which the customer requests are put onto the waiting list?
+        - **A FIFO queue in Amazon SQS**
+
+5. SA is designing customer order processing applications that will likely have high usage spikes. What should the Architect do to ensure that customer orders are not lost before being written to an RDS database?
+        - **Have the orders written into an Amazon SQS queue.**
+        - **Scale the number of processing nodes based on pending order volume.**
+
+6. Legacy app currently send messages through single EC2 instance, which then routes the messages to the appropriate destinations. The EC2 instance is a bottleneck and single point of failure, so company would like to address these issues. Which services could address this architectural use cases?
+        - **Amazon SNS**
+        - **Amazon SQS**
+
+7. App relies on messages being sent and received in order. The volume will never exceed more than 300 transactions each second. Which service should be used?
+        - **Amazon SQS**
+
+8. Website experiences unpredictable traffic. During peak traffic times, the DB is unable to keep up with the write request.Which AWS service will help decouple the web app from DB?
+        - **Amazon SQS**
+
+9. Company has web application to make requests to backend API service. API service is behind ELB running on EC2 instances. Most API service endpoint calls finish quickly but one endpoint that makes calls to create objects  in external service takes a long time to complete. These long running calls are causing client timeouts and increasing overall system latency. What to do to minimize system throughput impact of slow-running endpoint?
+         - **Use Amazon SQS to offload the long-running requests for asynchronous processing by separate workers.**
+
+10. SA designs three-tier web application to allow customers to upload pictures from mobile application. App will generate thumbnail of picture and return message to user confirming image successfully uploaded. Generation of thumbnail may take up to 5 seconds. To provide a sub second response time to the customers uploading the images, SA wants to separate web tier from application tier. Which service allow the presentation tier to dispatch request to application tier?
+          - **Amazon SQS**
+
+11. When designing SQS message processing solution, messages in queue must be processed before maximum retention time has elapsed. Which actions will meet this requirement?
+          - **Use Amazon EC2 instances in an Auto Scaling group with scaling triggered based on the queue length**
+          - **Increase the SQS queue attribute for the message retention period**
+
+12. An application publishes SNS messages in response to several events. An Lambda function subscribes to these messages. Occasionally the function will fail while processing a message, so the original event message must be preserved for root cause analysis. What architecture will meet these requirements without changing the workflow?
+          - **Configure a Dead Letter Queue for the Amazon SNS topic.**
+       
+## Route 53
+
+1. MultiValue Answer Routing would fit to random queries with health checks.
+2. You can use the cloudfront with Route 53 Geolocation Routing. But the location wise content delivery is already enabled in cloudfront, so geolocation policy wont help that much. If you are not using cloudfront and you want to distribute traffic based on user location, then you can use Route53
+3. For an active-active system, Geolocation, Geoproximity, Latency, Multivalue, or Weighted policies would work.
+https://medium.com/dazn-tech/how-to-implement-the-perfect-failover-strategy-using-amazon-route53-1cc4b19fa9c7
+
+
+Scenarios:
+
+1. SA has five web servers serving requests for a domain. Which of the following Route 53 routing policies can distribute traffic randomly among all healthy web servers?
+         - **Multivalue Answer**
+
+2. SA is designing a solution for dynamic website, “example.com” that is deployed in two regions: Tokyo, Japan and Sydney, Australia. Architect wants to ensure that user located in Australia are directed to website deployed in sydney and users in Japan are redirected to website in tokyo when they browse to example.com. Which service should the architect use to achieve this goal with LEAST administrative effort?
+         - **Amazon Route 53**
+
+3. Company is designing a failover strategy in Route 53 for its resources between two AWS regions. Company must have ability to route users traffic to the region with least latency, and if both regions are healthy, Route 53 should route traffic to resources in both regions. Which strategy should SA recommend?
+        - **Configure active-active failover using Route 53 latency DNS records.**
+
+4. Company is launching a static website using zone apex(mycompany.com). The company wants to use Route 53 for DNS. Which steps should the company perform to implement scalable and cost-effective solution?
+        - **Serve the website from an Amazon S3 bucket, and map a Route 53 alias record to the website endpoint.**
+        - **Create a Route 53 hosted zone, and set the NS records of the domain to use Route 53 name servers.**
+
+5. SA is designing a web app that will be hosted on EC2 instances in public subnet. The web app uses mySQL DB in private subnet. DB should be accessible to DBA. Which of the following SA should recommend?
+        - **Create a bastion host in a public subnet, and use the bastion host to connect to the database.**
+        - **Create an IPSec VPN tunnel between the customer site and the VPC, and use the VPN tunnel to connect to the database.**
+
+## MQ
+
+1. Amazon MQ is a managed message broker service for Apache ActiveMQ that makes it easy to set up and operate message brokers in the cloud. Message brokers allow different software systems–often using different programming languages, and on different platforms–to communicate and exchange information. With Amazon MQ, you can use industry standard APIs and protocols for messaging, including JMS, NMS, AMQP, STOMP, MQTT, and WebSocket. You can easily move from any message broker that uses these standards to Amazon MQ because you don’t have to rewrite any messaging code in your applications.
+
+Scenarios:
+
+1. Company migration an on-premises application to AWS. App uses corporate message broker, passing messages between layers by using MQTT protocol. Due to time and budget constraint, company cannot rewrite the application and cannot manage new message broker on EC2 instances. Which service to use to allow customer to migrate app to AWS?
+        - **Amazon MQ**
+
+## Network Load Balancer
+
+1. Choose an Application Load Balancer when you need a flexible feature set for your web applications with HTTP and HTTPS traffic.
+Choose a Network Load Balancer when you need ultra-high performance, TLS offloading at scale, centralized certificate deployment, support for UDP, and static IP addresses for your application.
+2. Host-based routing use host conditions to define rules that forward requests to different target groups based on the host name in the host header. This enables ALB to support multiple domains using a single load balancer.
+Path-based routing use path conditions to define rules that forward requests to different target groups based on the URL in the request. Each path condition has one path pattern. If the URL in a request matches the path pattern in a listener rule exactly, the request is routed using that rule.
+3. The Health check is configured for ELB and failing, however the Auto Scaling needs to use the ELB health check, in addition to the system checks, to determine if the instance in healthy. Hence the Auto Scaling group needs to be updated to use ELB health check for terminating the instances.
+4. Application Load Balancer. Keywords: Distribute based on URL = Path based routing for ALB
+5. For example, previously Amazon S3 performance guidelines recommended randomizing prefix naming with hashed characters to optimize performance for frequent data retrieval. You no longer have to randomize prefix naming for performance, and can use sequential date-based naming for your prefixes.
+
+Scenarios:
+
+1. Customer has application used by enterprise customers outside of AWS. Some of them use legacy firewalls that cannot whitelist by DNS name, but whitelist based only on IP address. App is deployed in two AZ, with one EC2 instance in each that has Elastic IP address. Customer wants to whitelist only two IP addresses, but the two existing EC2 instances cannot sustain the amount of traffic. What can SA do to support customer and allow for more capacity?
+       - **Create a Network Load Balancer with an interface in each subnet, and assign a static IP address to each subnet.**
+       - **Switch the two existing EC2 instances for an Auto Scaling group, and register them with the Network Load Balancer.**
+
+2. SA is designing web application that runs on EC2 instances behind a load balancer. All data in transit must be encrypted. Which solutions will meet the encryption requirement?
+        - **Use a Network Load Balancer (NLB) with a TCP listener, then terminate SSL on EC2 instances.**
+        - **Use an Application Load Balancer (ALB) with an HTTPS listener, then install SSL certificates on the ALB and EC2 instances.**
+
+3. Large media site have multiple applications in ECS. SA needs to use content metadata and route traffic to specific services. What is the most efficient method to perform this task?
+        - **Use an AWS Application Load Balancer with host-based routing option to route traffic to the correct service.**
+
+4. A client has setup an Auto Scaling group associated with load balancer. Client noticed that instances launched by Auto Scaling group are reported unhealthy as a result of ELB health check, but these unhealthy instances are not being terminated. What can solutions architect do to ensure that the instances marked unhealthy will be terminated and replaced?
+        - **Change the health check type to ELB for the Auto Scaling group.**
+
+5. Company has asked SA to modify its AWS hosted internal application to allow for load balancing. The customer requests always come from the company domain (example.net). The company requires that incoming HTTP and HTTPS traffic is routed based on the path element of the URL in the request. Which implementation can satisfy all requirements?
+        - **Configure an Application Load Balancer with listeners for appropriate path patterns for the target group.**
+
+6. Company needs to capture all client connection information from its ALB every 5 mins. This data will be used to analyze traffic patterns and troubleshoot the application. How can SA meet this requirement?
+        - **Enable Access Logs on the Application Load Balancer.**
+
+7. App tier currently hosts two web services on same set of instances, listening on different ports. Which AWS service should SA use to route traffic to the service based on the incoming request path?
+        - **AWS Application Load Balancer**
+
+8. SA is designing microservices-based app using ECS. App includes a WebSocket component, and the traffic needs to be distributed between microservices based on the URL. Which service should the Architect choose to distribute the workload?
+        - **ELB Application Load Balancer**
+
+9. Admin is hosting an app on single EC2 instance, which users can access by public hostname. Admin is adding a second instance, but does not want users to have to decide between many public hostnames. Which AWS service will decouple users from EC2 instances?
+        - **Amazon ELB**
+
+10. SA is designing a highly-available website that is served by multiple web servers hosted outside of AWS. If an instance becomes unresponsive, SA needs to remove it from rotation. What is the MOST efficient way to fulfill this requirement?
+       - **Use an Amazon Elastic Load Balancer.**
+
+11. SA is designing sol with Lambda where diff environment require different database passwords. What should SA do to accomplish this in a secure and scalable way?
+        - **Use encrypted AWS Lambda environmental variables.**
+
+12. SA is designing the solution to store large quantities of event data in S3. Architect anticipates that the workload will exceed 100 requests each second. What should SA do in S3 to optimizate performance?
+        - **Randomize a key name prefix.**
+
+
+## Miscellaneous
+
+Scenarios:
+1. Company is moving to AWS. Management has identified a set of approved AWS services that meet all deployment requirements. The company would like to restrict access to all other unapproved services to which employees would have access. Which sol meets these requirements with LEAST amount of operational overhead?
+       - **Configure AWS Organizations. Create an organizational unit (OU) and place all AWS accounts into the OU. Apply a service control policy (SCP) to the OU that denies the use of certain services.**
+
+2. Company has asked SA to ensure that data is protected during data transfer to and from S3. Use of which service will protect the data in transit?
+        - **HTTPS**
+
+Use encryption to protect your data
+If your use case requires encryption during transmission, Amazon S3 supports the HTTPS protocol, which encrypts data in transit to and from Amazon S3. All AWS SDKs and AWS tools use HTTPS by default.
+Note: If you use third-party tools to interact with Amazon S3, contact the developers to confirm if their tools also support the HTTPS protocol.
+
+3. SA is designing a public facing web app for employees to upload images to their social media account. The application consists of multiple EC2 instances behind an ELB, an S3 bucket where uploaded images are stored, and DynamoDB for storing image metadata. Which AWS service can the Architect use to automate the process of updating metadata in the DynamoDB table upon image upload?
+          - **AWS Lambda**
+lambda can be used when you uploaded an image to S3 and it can trigger lambda function to store image metadata to DynamoDB
+
+4. Which tool analyzes account resources and provides detailed inventory changes over time?
+           - **AWS Config**
+       AWS Config provides a detailed view of the configuration of AWS resources in your AWS account. This includes how the resources are related to one another and how they were configured in the past so that you can see how the configurations and relationships change over time.
+
+5. After reviewing the logs, startup company noticed large, random spikes in traffic to their web application. The company wants to configure a cost efficient auto scaling solution to support high availability of the web application. Which scaling plan should SA recommend to meet the company’s needs?
+      - **Dynamic**
+random=>Dynamic
+
+6. A media company has deployed multi-tier architecture on AWS. Web servers are deployed in two AZ using an Auto scaling group with default autoscaling termination policy. The web servers Auto scaling group currently has 15 instances running. Which instances will be terminated first during a scale-in operation?
+       - **The instance in the Availability Zone that has most instances.**
+
+There's also a key piece of information here - 15 instances. As you can't have half an instance, we can assume there is an uneven split between the two AZs (probably 7 at one and 8 at the other).
+Therefore scenario #1 of https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-instance-termination.html will apply because it there will definitely be an AZ to pick from that has mores instances available to terminate first before going on to other criteria for further scale-in actions.
+
+7. Org designs a mobile application for their customers to upload photos to a site. App needs secure login with MFA. Org wants to limite the initial build time and maintenance of the solution. Which solution should SA recommend to meet these requirements?
+       - **Use Amazon Cognito Identity with SMS-based MFA.**
+
+Mobile/web app authentication, think cognito. If supports MFA as well
+
+8. A company is developing several critical long running applications hosted on Docker. How should SA design a solution to meet the scalability and orchestration requirements on AWS?
+       - **Use Amazon ECS and Service Auto Scaling.**
+ECS = Docker
+
+9. A workload consists of downloading an image from S3 bucket, processing the image and moving it to other S3 bucket. EC2 instance runs a scheduled task every hour to perform the operation. How should SA redesign the process so that it is highly available?
+       - **Trigger a Lambda function when a new object is uploaded**
+
+10. SA needs to design an architecture for a new, mission critical batch processing billing application. The app is required to run Monday, Wednesday and Friday from 5am to 11am. Which is the MOST cost effective EC2 pricing model?
+       - **Scheduled Reserved Instances**
+
+11. SA has a two-tier app with single EC2 instance web server and RDS MySQL Multi-AZ DB instances. The Architect is re-architecting the app for high availability by adding instances in a second AZ. Which additional services will improve the availability of the app?
+        - **Auto Scaling group**
+        - **ELB Classic Load Balancer**
+
+12. SA is designing a stateful web app that will run for one year (24/7) and then be decommisioned. Load on this platform will be constant, using a number of r4.8x large instances. Key drivers for this system include HA, but elasticity is not required. What is the most cost effective way to purchase compute for this platform?
+       - **Standard Reserved Instances**
+Keywords: stateful web application = needs constant storage to hold different types of data including session data. Highly Available and cheapest = Standard reserved instances
+
+13. Company is launching marketing campaign on their web tomorrow and expects a significant increase in traffic. Web is designed as multi-tiered web architecture and the increase in traffic could overwhelm current design. What should SA do to minimize effects from potential failure in one or more of tiers?
+       - **Use Auto Scaling to keep up with the demand**
+
+14. SA has multi layer app running in VPC. The app has an ELB CLB as front end in public subnet, and an EC2 based reverse proxy that performs content based routing to two backend EC2 instances hosted in private subnet. Architect sees tremendous traffic growth and is concerned that reverse proxy and current backend setup will be insufficient. Which actions should SA take to achieve cost effective sol that ensures the app automatically scales to meet traffic demand?
+         - **Add Auto Scaling to the Amazon EC2 backend fleet.**
+         - **Replace both the frontend and reverse proxy layers with an ELB Application Load Balancer.**
+Due to the reverse proxy being a bottleneck to scalability, we need to replace it with a solution that can perform content-based routing. This means we must use an ALB not a CLB as ALBs support path-based and host-based routing Auto Scaling should be added to the architecture so that the back end EC2 instances do not become a bottleneck. With Auto Scaling instances can be added and removed from the back end fleet as demand changes A Classic Load Balancer cannot perform content-based routing so cannot be used It is unknown how the reverse proxy can be scaled with Auto Scaling however using an ALB with content-based routing is a much better design as it scales automatically and is HA by default Burstable performance instances, which are T3 and T2 instances, are designed to provide a baseline level of CPU performance with the ability to burst to a higher level when required by your workload. CPU performance is not the constraint here and this would not be a cost-effective solution
+
+15. SA is designing a photo app on AWS. Every time a user uploads a photo on S3, the architect must insert a new item to the DynamoDB table. Which AWS managed service is the BEST fit to insert the item?
+         - **Lambda@Edge**
+
+16. Company plans to use AWS for all new batch processing workloads. The companys devs use Docker containers for the new batch processing. The system design must accomodate critical and non-critical batch processing workloads 24/7. How should SA design this architecture in a cost-efficient manner?
+        - **Use Amazon ECS orchestration and Auto Scaling groups: one with Reserve Instances, one with Spot Instances.**
+
+17. Ecommerce apps are hosted on AWS. The last time a new product was launched, the app experienced a performance issue due to an enormous spike in traffic. Management decided that capacity must be doubled the week after the product is launched. Which is the MOST efficient way for management to ensure that capacity requirements are met?
+         - **Add a Step Scaling policy.**
+
+18. A call center app consists of a three-tier app using Auto scaling groups to automatically scale resources as needed. Users report that every morning at 9:00 am the system becomes very slow for about 15 mins. A SA determines that a large percentage of the call center staff starts work at 9:00 AM, so auto scaling does not have enough time to scale out to meet demand. How can the Architect fix the problem?
+        - **Create an Autoscaling scheduled action to scale out the necessary resources at 8:30 AM every morning.**
+
+
+
+
+
+
+
+
+
 
      
 
