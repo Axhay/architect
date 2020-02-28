@@ -376,7 +376,7 @@ You can store and view the metrics that you collect with the CloudWatch agent in
 ✑ Basic Monitoring for Amazon EC2 instances: Seven pre-selected metrics at five-minute frequency and three status check metrics at one-minute frequency, for no additional charge.
 ✑ Detailed Monitoring for Amazon EC2 instances: All metrics available to Basic Monitoring at one-minute frequency, for an additional charge. Instances with
 Detailed Monitoring enabled allows data aggregation by Amazon EC2 AMI ID and instance type.
-7. 
+
 
 Scenarios:
 
@@ -1566,6 +1566,7 @@ Scenarios:
        - **Create an Amazon Kinesis Firehouse delivery stream to store the data in Amazon S3.**
   
 ## API Gateway
+
 1. Lambda and API because it has to scale based on demand. SPOT instances do work for stateless apps, should be in a comparable price versus lambda but the issue is elasticity and how these instances are going to be available (or the lack of certainty they will).
 2. Amazon API Gateway is a fully managed service that makes it easy for developers to create, publish, maintain, monitor, and secure APIs at any scale. With a few clicks in the AWS Management Console, you can create REST and WebSocket APIs that act as a “front door” for applications to access data, business logic, or functionality from your backend services, such as workloads running on Amazon Elastic Compute Cloud (Amazon EC2), code running on AWS Lambda, any web application, or real-time communication applications.
 API Gateway handles all the tasks involved in accepting and processing up to hundreds of thousands of concurrent API calls, including traffic management, authorization and access control, monitoring, and API version management. API Gateway has no minimum fees or startup costs.
