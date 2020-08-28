@@ -40,5 +40,5 @@
 3. must have backups turned on
 4. can be in different regions
 5. can be aurora of mysql
-6. can be promoted to master, this will breadk read replica multi-az
+6. can be promoted to master, this will break read replica multi-az
 
