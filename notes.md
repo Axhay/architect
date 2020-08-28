@@ -235,7 +235,7 @@ Amazon EFS provides elastic, shared file storage that is POSIX-compliant. The fi
 2. Replicate the environment of on premises to AWS by using CloudFormation.
 3. For Availability Multi AZ, For Performance Read Replica
 
-## RDS - Relational Database Service.
+## RDS - Relational Database Service
 
 1. With RDS Storage Auto Scaling, you simply set your desired maximum storage limit, and Auto Scaling takes care of the rest.
 2. You can only enable encryption for an Amazon RDS DB instance when you create it, not after the DB instance is created.
