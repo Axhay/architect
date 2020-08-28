@@ -55,8 +55,6 @@
 
 [Network Loadbalancers](#Network-Loadbalancers)
 
-[Miscellaneous](#Miscellaneous)
-
 ## Spot Instance
 
 1. Recover from Instance Failures.
